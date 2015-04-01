@@ -69,6 +69,7 @@ def change_index(action, changes):
 
 
 def write_index():
+    """Запись локального файла индекса"""
     f = open(CACHEINDEX, "w")
 
     for i in CACHEPKGLIST:
@@ -198,6 +199,7 @@ def pkg_remove(pkg_name):
 
 
 def pkgs_remove(packages):
+    """Функция группового удаления"""
     for pkg_name in packages:
         pkg_remove(pkg_name)
 
