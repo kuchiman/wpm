@@ -1,8 +1,38 @@
-import os, sys, re, argparse, shutil, subprocess
+import os, sys, re, argparse, shutil, subprocess, ConfigParser
 from config import *
 
-INDEX = os.path.join('', REPO_DIR, 'index.txt')
-CACHEINDEX = os.path.join('', CACHE_DIR, 'index.txt')
+REPO_DIR = ''            # Адрес сетевого репозитория
+CACHE_DIR = ''           # Адрес локального кэша
+
+INDEX = ''               # Адрес индекса репозитория
+CACHEINDEX = ''          # Адрес локального индекса
+
+PKGLIST = []             # Список доступных пакетов
+CACHEPKGLIST = []        # Список установленных пакетов
+
+
+def read_index(index):
+    """Функция читает индекс и возвращает массив"""
+    f = open(index, "r")
+    pkgs_re = re.compile('(?:name=)([a-zA-Z0-9_-]+.pkg)(?: +version=)([0-9.]+)(?: *)')
+    tmp = f.read()
+    f.close()
+    return pkgs_re.findall(tmp)
+
+
+def read_config():
+    """Функция читает конфиг и инициализирует глобальные переменные"""
+    config = ConfigParser.ConfigParser()
+    config.read(config.ini)
+
+    REPO_DIR = config.get('REPOSITORY', 'dir')
+    CACHE_DIR = config.get('CACHE', 'dir')
+
+    INDEX = os.path.join('', REPO_DIR, 'index.txt')
+    CACHEINDEX = os.path.join('', CACHE_DIR, 'index.txt')
+
+    PKGLIST = read_index(INDEX)
+    CACHEPKGLIST = read_index(CACHEINDEX)
 
 
 def repo_check():
@@ -29,15 +59,6 @@ def cache_check():
         print('Кэш доступен...')
 
 
-def read_index(index):
-    """Функция читает индекс и возвращает массив"""
-    f = open(index, "r")
-    pkgs_re = re.compile('(?:name=)([a-zA-Z0-9_-]+.pkg)(?: +version=)([0-9.]+)(?: *)')
-    tmp = f.read()
-    f.close()
-    return pkgs_re.findall(tmp)
-
-
 def search_in_index(index, name):
     """Функция ищет в списке пакетов пакет с именем указанным во втором
     параметре Возвращает индекс элемента в списке или если элемент не найдет
@@ -46,12 +67,6 @@ def search_in_index(index, name):
         if name == i[0]:
             return index.index(i)
     return -1
-
-repo_check()
-cache_check()
-
-PKGLIST = read_index(INDEX)            # Список доступных пакетов
-CACHEPKGLIST = read_index(CACHEINDEX)  # Список установленных пакетов
 
 
 def change_index(action, changes):
@@ -112,8 +127,8 @@ def pkg_download(pkg_name, pkg_version):
     if not os.path.isdir(tmp):  # Если директория для пакета не существует
         os.makedirs(tmp)
         os.makedirs(dst)
-    elif os.path.isdir(tmp) and not os.path.isdir(dst):  # Если директория существует
-        print(os.path.isdir(tmp) and not os.path.isdir(dst))
+    elif os.path.isdir(tmp) and not os.path.isdir(dst):  # Если директория
+        print(os.path.isdir(tmp) and not os.path.isdir(dst))  # существует
         os.makedirs(dst)                  # но нет директории с номером версии
     else:       # Если путь существует значит там что то лежит, удалить всё
         shutil.rmtree(dst)
@@ -220,6 +235,10 @@ def createParser():
 if __name__ == "__main__":
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
+
+    read_config()
+    repo_check()
+    cache_check()
 
     if namespace.command == "list":
         if namespace.what is None:
