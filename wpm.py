@@ -1,5 +1,4 @@
 import os, sys, re, argparse, shutil, subprocess
-#import zipfile
 from config import *
 
 INDEX = os.path.join('', REPO_DIR, 'index.txt')
@@ -118,11 +117,6 @@ def pkg_download(pkg_name, pkg_version):
         shutil.rmtree(dst)
         os.makedirs(dst)
 
-    """shutil.copyfile(src,pkg)
-
-    with zipfile.ZipFile(pkg, "r") as z:
-        z.extractall(dst)"""
-
     shutil.unpack_archive(src, dst, 'zip')
 
 
@@ -136,8 +130,8 @@ def pkg_install(pkg_name):
     if not '.pkg' in pkg_name:           # Если имя не содержит расширение
         pkg_name = pkg_name + '.pkg'     # то добавляем в конец (это криво)
 
-    current_pkg = search_in_index(PKGLIST, pkg_name)
-    current_cache_pkg = search_in_index(CACHEPKGLIST, pkg_name)
+    current_pkg = search_in_index(PKGLIST, pkg_name)  # Версия в репах
+    current_cache_pkg = search_in_index(CACHEPKGLIST, pkg_name)  # Локальная
 
     if current_pkg < 0:                 # Проверяем есть ли такой в репах
         print(pkg_name + " Пакет с таким именет отсутствует!!")
@@ -164,13 +158,12 @@ def pkg_install(pkg_name):
             'install'], stdout=subprocess.PIPE)
         change_index('w', (pkg_name, pkg_version))
 
-    write_index()
-
 
 def pkgs_install(packages):
     """Функция групповой установки пакетов"""
     for pkg_name in packages:
         pkg_install(pkg_name)
+    write_index()
 
 
 def pkg_remove(pkg_name):
@@ -195,13 +188,13 @@ def pkg_remove(pkg_name):
         'remove'], shell=True, stdout=subprocess.PIPE)
     shutil.rmtree(os.path.join('', CACHE_DIR, pkg_name, pkg_version))
     change_index('d', (pkg_name, pkg_version))
-    write_index()
 
 
 def pkgs_remove(packages):
     """Функция группового удаления"""
     for pkg_name in packages:
         pkg_remove(pkg_name)
+    write_index()
 
 
 def createParser():
