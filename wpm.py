@@ -167,6 +167,7 @@ def pkg_install(pkg_name):
 
 
 def pkgs_install(packages):
+    """Функция групповой установки пакетов"""
     for pkg_name in packages:
         pkg_install(pkg_name)
 
