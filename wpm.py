@@ -105,7 +105,7 @@ def pkg_download(pkg_name, pkg_version):
     src = os.path.join('', REPO_DIR, pkg_name)
     tmp = os.path.join('', CACHE_DIR, pkg_name)
     dst = os.path.join('', tmp, pkg_version)
-    pkg = os.path.join('', dst, pkg_name)
+    #pkg = os.path.join('', dst, pkg_name)
 
     if not os.path.isdir(tmp):  # Если директория для пакета не существует
         os.makedirs(tmp)
