@@ -20,9 +20,11 @@ def repo_check():
 def cache_check():
     """Функция проверяет наличие файла индекса"""
     if not os.path.isdir(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
-        open(CACHEINDEX, 'a').close()
+        os.makedirs(CACHE_DIR)          # Создана директория
+        open(CACHEINDEX, 'a').close()   # Создан пустой индекс
         print('Кэш создан...')
+    elif not os.path.isfile(CACHEINDEX):
+        open(CACHEINDEX, 'a').close()
     else:
         print('Кэш доступен...')
 
