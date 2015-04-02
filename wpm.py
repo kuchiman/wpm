@@ -1,4 +1,4 @@
-import os, sys, re, argparse, shutil, subprocess, ConfigParser
+import os, sys, re, argparse, shutil, subprocess, configparser
 from config import *
 
 REPO_DIR = ''            # Адрес сетевого репозитория
@@ -22,7 +22,7 @@ def read_index(index):
 
 def read_config():
     """Функция читает конфиг и инициализирует глобальные переменные"""
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(config.ini)
 
     REPO_DIR = config.get('REPOSITORY', 'dir')
