@@ -46,6 +46,11 @@ def read_config():
     PKGLIST = read_index(INDEX)
     CACHEPKGLIST = read_index(CACHEINDEX)
 
+    print(REPO_DIR)
+    print(CACHE_DIR)
+    print(INDEX)
+    print(CACHEINDEX)
+
 
 def repo_check():
     """Функция проверяет доступность директории с пакетами"""
