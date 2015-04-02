@@ -119,18 +119,19 @@ def pkgs_list_updated():
                     cachepkg_version + "\t| " + pkg_version)
 
 
-def pkg_download(pkg_name, pkg_version):
+def pkg_download(pkg_name):
     """Функция загружает пакет из репозитория в кэш"""
-    src = os.path.join('', REPO_DIR, pkg_name)
-    tmp = os.path.join('', CACHE_DIR, pkg_name)
-    dst = os.path.join('', tmp, pkg_version)
-    #pkg = os.path.join('', dst, pkg_name)
+    pkg_version = PKGLIST.get(pkg_name, 'version')
+    pkg_file = PKGLIST.get(pkg_name, 'file')
+    src = os.path.join('', REPO_DIR, pkg_file)
+    name_dir = os.path.join('', CACHE_DIR, pkg_name)
+    dst = os.path.join('', name_dir, pkg_version)
 
-    if not os.path.isdir(tmp):  # Если директория для пакета не существует
-        os.makedirs(tmp)
-        os.makedirs(dst)
-    elif os.path.isdir(tmp) and not os.path.isdir(dst):  # Если директория
-        print(os.path.isdir(tmp) and not os.path.isdir(dst))  # существует
+    if not os.path.isdir(name_dir):  # Если директория для пакета не существует
+        os.makedirs(name_dir)
+        os.makedirs(name_dir)
+    elif os.path.isdir(name_dir) and not os.path.isdir(dst):  # Если директория
+        print(os.path.isdir(name_dir) and not os.path.isdir(dst))  # существует
         os.makedirs(dst)                  # но нет директории с номером версии
     else:       # Если путь существует значит там что то лежит, удалить всё
         shutil.rmtree(dst)
