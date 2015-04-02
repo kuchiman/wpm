@@ -21,11 +21,24 @@ def read_index(index):
 
 def read_config():
     """Функция читает конфиг и инициализирует глобальные переменные"""
+    if not os.path.isfile('config.ini'):
+        print('Отсутствует конфигурационный файл!!')
+        raise SystemExit(1)
+
     config = configparser.ConfigParser()
     config.read('config.ini')
 
-    REPO_DIR = config.get('REPOSITORY', 'dir')
-    CACHE_DIR = config.get('CACHE', 'dir')
+    if config.has_section('REPOSITORY') and config.has_option('REPOSITORY', 'dir'):
+        REPO_DIR = config.get('REPOSITORY', 'dir')
+    else:
+        print('Конфигурационный файл повреждён!! Не указан адрес репозитория')
+        raise SystemExit(1)
+
+    if config.has_section('CACHE') and config.has_option('CACHE', 'dir'):
+        CACHE_DIR = config.get('CACHE', 'dir')
+    else:
+        print('Конфигурационный файл повреждён!! Не указан адрес кэша')
+        raise SystemExit(1)
 
     INDEX = os.path.join('', REPO_DIR, 'index.txt')
     CACHEINDEX = os.path.join('', CACHE_DIR, 'index.txt')
