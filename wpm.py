@@ -22,12 +22,12 @@ def read_index(index):
 def read_config():
     """Функция читает конфиг и инициализирует глобальные переменные"""
 
-    global REPO_DIR, CACHE_DIR
+    global REPO_DIR, CACHE_DIR, INDEX, CACHEINDEX, PKGLIST, CACHEPKGLIST
     #global CACHE_DIR
-    global INDEX
-    global CACHEINDEX
-    global PKGLIST
-    global CACHEPKGLIST
+    #global INDEX
+    #global CACHEINDEX
+    #global PKGLIST
+    #global CACHEPKGLIST
 
     if not os.path.isfile('config.ini'):
         print('Отсутствует конфигурационный файл!!')
