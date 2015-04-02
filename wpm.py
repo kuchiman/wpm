@@ -22,7 +22,7 @@ def read_index(index):
 def read_config():
     """Функция читает конфиг и инициализирует глобальные переменные"""
     config = configparser.ConfigParser()
-    config.read(config.ini)
+    config.read('config.ini')
 
     REPO_DIR = config.get('REPOSITORY', 'dir')
     CACHE_DIR = config.get('CACHE', 'dir')
