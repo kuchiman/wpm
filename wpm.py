@@ -53,6 +53,10 @@ def read_config():
 
 
 def repo_check():
+    print(REPO_DIR)
+    print(CACHE_DIR)
+    print(INDEX)
+    print(CACHEINDEX)
     """Функция проверяет доступность директории с пакетами"""
     if not os.path.isdir(REPO_DIR):
         print(REPO_DIR + 'Репозиторий не доступен!!')
