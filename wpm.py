@@ -1,5 +1,4 @@
 import os, sys, re, argparse, shutil, subprocess, configparser
-from config import *
 
 REPO_DIR = ''            # Адрес сетевого репозитория
 CACHE_DIR = ''           # Адрес локального кэша
