@@ -19,15 +19,34 @@ def read_index(index):
     return pkgs_re.findall(tmp)
 
 
+def repo_check():
+    """Функция проверяет доступность директории с пакетами"""
+    if not os.path.isdir(REPO_DIR):
+        print(REPO_DIR + 'Репозиторий не доступен!!')
+        raise SystemExit(1)
+    elif not os.path.isfile(INDEX):
+        print('Отсутствует индекс!!')
+        raise SystemExit(1)
+    else:
+        print('Репозиторий доступен...')
+
+
+def cache_check():
+    """Функция проверяет наличие файла индекса"""
+    if not os.path.isdir(CACHE_DIR):
+        os.makedirs(CACHE_DIR)          # Создана директория
+        open(CACHEINDEX, 'a').close()   # Создан пустой индекс
+        print('Кэш создан...')
+    elif not os.path.isfile(CACHEINDEX):
+        open(CACHEINDEX, 'a').close()
+    else:
+        print('Кэш доступен...')
+
+
 def read_config():
     """Функция читает конфиг и инициализирует глобальные переменные"""
 
     global REPO_DIR, CACHE_DIR, INDEX, CACHEINDEX, PKGLIST, CACHEPKGLIST
-    #global CACHE_DIR
-    #global INDEX
-    #global CACHEINDEX
-    #global PKGLIST
-    #global CACHEPKGLIST
 
     if not os.path.isfile('config.ini'):
         print('Отсутствует конфигурационный файл!!')
@@ -51,41 +70,11 @@ def read_config():
     INDEX = os.path.join('', REPO_DIR, 'index.txt')
     CACHEINDEX = os.path.join('', CACHE_DIR, 'index.txt')
 
+    repo_check()
+    cache_check()
+
     PKGLIST = read_index(INDEX)
     CACHEPKGLIST = read_index(CACHEINDEX)
-
-    print(REPO_DIR)
-    print(CACHE_DIR)
-    print(INDEX)
-    print(CACHEINDEX)
-
-
-def repo_check():
-    print(REPO_DIR)
-    print(CACHE_DIR)
-    print(INDEX)
-    print(CACHEINDEX)
-    """Функция проверяет доступность директории с пакетами"""
-    if not os.path.isdir(REPO_DIR):
-        print(REPO_DIR + 'Репозиторий не доступен!!')
-        raise SystemExit(1)
-    elif not os.path.isfile(INDEX):
-        print('Отсутствует индекс!!')
-        raise SystemExit(1)
-    else:
-        print('Репозиторий доступен...')
-
-
-def cache_check():
-    """Функция проверяет наличие файла индекса"""
-    if not os.path.isdir(CACHE_DIR):
-        os.makedirs(CACHE_DIR)          # Создана директория
-        open(CACHEINDEX, 'a').close()   # Создан пустой индекс
-        print('Кэш создан...')
-    elif not os.path.isfile(CACHEINDEX):
-        open(CACHEINDEX, 'a').close()
-    else:
-        print('Кэш доступен...')
 
 
 def search_in_index(index, name):
@@ -266,8 +255,8 @@ if __name__ == "__main__":
     namespace = parser.parse_args(sys.argv[1:])
 
     read_config()
-    repo_check()
-    cache_check()
+    #repo_check()
+    #cache_check()
 
     if namespace.command == "list":
         if namespace.what is None:
