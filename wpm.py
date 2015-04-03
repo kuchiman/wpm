@@ -143,7 +143,10 @@ def pkg_download(pkg_name):
 
 def pkg_install(pkg_name):
     """Функция устанавливает пакет с указанным именем."""
-    cachepkg_version = CACHEPKGLIST.get(pkg_name, 'version')
+    if CACHEPKGLIST.has_section(pkg_name):
+        cachepkg_version = CACHEPKGLIST.get(pkg_name, 'version')
+    else:
+        cachepkg_version = '0'
 
     if PKGLIST.has_section(pkg_name):         # Проверяем есть ли такой в репах
         pkg_version = PKGLIST.get(pkg_name, 'version')  # Какая версия в репах
