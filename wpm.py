@@ -231,7 +231,7 @@ def createParser():
     remove_parser.add_argument('packages', nargs='+')
 
     show_parser = subparsers.add_parser('show')
-    list_parser.add_argument('what',
+    show_parser.add_argument('what',
         choices=['config'], nargs='?')
 
     return parser
