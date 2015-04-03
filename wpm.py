@@ -8,7 +8,7 @@ CACHEINDEX = ''                               # Адрес локального 
 
 PKGLIST = configparser.ConfigParser()         # Список доступных пакетов
 CACHEPKGLIST = configparser.ConfigParser()    # Список установленных пакетов
-
+##test
 
 def repo_check():
     """Функция проверяет доступность директории с пакетами"""
@@ -48,13 +48,13 @@ def read_config():
     config.read('config.ini')
 
     if 'REPOSITORY' in config and 'dir' in config['REPOSITORY']:
-        REPO_DIR = config.get('REPOSITORY', 'dir')
+        REPO_DIR = config['REPOSITORY']['dir']
     else:
         print('Конфигурационный файл повреждён!! Не указан адрес репозитория')
         raise SystemExit(1)
 
-    if config.has_section('CACHE') and config.has_option('CACHE', 'dir'):
-        CACHE_DIR = config.get('CACHE', 'dir')
+    if 'CACHE' in config and 'dir' in config['CACHE']:
+        CACHE_DIR = config['CACHE']['dir']
     else:
         print('Конфигурационный файл повреждён!! Не указан адрес кэша')
         raise SystemExit(1)
@@ -67,7 +67,6 @@ def read_config():
 
     PKGLIST.read(INDEX)
     CACHEPKGLIST.read(CACHEINDEX)
-
 
 
 def show_config():
