@@ -26,11 +26,11 @@ def cache_check():
     """Функция проверяет наличие файла индекса"""
     if not os.path.isdir(CACHE_DIR):
         os.makedirs(CACHE_DIR)          # Создана директория
-        open(CACHEINDEX, 'a').close()   # Создан пустой индекс
+        open(CACHEINDEX, 'w+').close()   # Создан пустой индекс
         print('Кэш создан...')
     else:
         if not os.path.isfile(CACHEINDEX):
-            open(CACHEINDEX, 'a').close()
+            open(CACHEINDEX, 'w+').close()
             print("Создан индекс...")
     print('Кэш доступен...')
 
