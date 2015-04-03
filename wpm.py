@@ -76,8 +76,8 @@ def show_config():
     print("Адрес кэша" + CACHE_DIR)
     print("Индекс репозитория" + INDEX)
     print("Индекс кэша" + CACHEINDEX)
-    print("Доступные пакеты" + PKGLIST.secton())
-    print("Установленные пакеты" + CACHEPKGLIST.secton())
+    print("Доступные пакеты" + PKGLIST.sectons())
+    print("Установленные пакеты" + CACHEPKGLIST.sectons())
 
 
 def change_index(action, pkg_name):
