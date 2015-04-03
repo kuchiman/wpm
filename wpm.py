@@ -79,9 +79,9 @@ def show_config():
     #print("Доступные пакеты" + PKGLIST.sectons())
     #print("Установленные пакеты" + CACHEPKGLIST.sectons())
     print("Доступные пакеты")
-    print(type(PKGLIST))
+    print(PKGLIST.sectons())
     print("Установленные пакеты")
-    print(type(CACHEPKGLIST))
+    print(CACHEPKGLIST.sectons())
 
 
 def change_index(action, pkg_name):
