@@ -69,6 +69,17 @@ def read_config():
     CACHEPKGLIST.read(CACHEINDEX)
 
 
+
+def show_config():
+    """Функция выводит глобальные переменные"""
+    print("Адрес репозитория " + REPO_DIR)
+    print("Адрес кэша" + CACHE_DIR)
+    print("Индекс репозитория" + INDEX)
+    print("Индекс кэша" + CACHEINDEX)
+    print("Доступные пакеты" + PKGLIST.secton())
+    print("Установленные пакеты" + CACHEPKGLIST.secton())
+
+
 def change_index(action, pkg_name):
     """Функция добавляет или удаляет запись о пакете в системной
     переменной(не в файле индекса) Первый аргумент это необходимое действие
@@ -219,6 +230,10 @@ def createParser():
     remove_parser = subparsers.add_parser('remove')
     remove_parser.add_argument('packages', nargs='+')
 
+    show_parser = subparsers.add_parser('show')
+    list_parser.add_argument('what',
+        choices=[], nargs='?')
+
     return parser
 
 
@@ -235,6 +250,9 @@ if __name__ == "__main__":
             pkgs_list_installed()
         elif namespace.what == 'updated':
             pkgs_list_updated()
+    elif namespace.command == "show":
+        if namespace.what is None:
+            show_config()
     elif namespace.command == "install":
         pkgs_install(namespace.packages)
     elif namespace.command == "remove":
