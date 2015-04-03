@@ -69,7 +69,6 @@ def read_config():
     CACHEPKGLIST.read(CACHEINDEX)
 
 
-
 def show_config():
     """Функция выводит глобальные переменные"""
     print("Адрес репозитория " + REPO_DIR)
