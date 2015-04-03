@@ -168,7 +168,7 @@ def pkg_install(pkg_name):
             change_index('update', pkg_name)
     else:
         print("Пакет будет установлен")
-        pkg_download(pkg_name, pkg_version)
+        pkg_download(pkg_name)
         p = subprocess.call(['python',
             os.path.join('', CACHE_DIR, pkg_name, pkg_version, 'script.py'),
             'install'], stdout=subprocess.PIPE)
