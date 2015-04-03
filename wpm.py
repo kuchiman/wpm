@@ -130,7 +130,7 @@ def pkg_download(pkg_name):
 
     if not os.path.isdir(name_dir):  # Если директория для пакета не существует
         os.makedirs(name_dir)
-        os.makedirs(name_dir)
+        os.makedirs(dst)
     elif os.path.isdir(name_dir) and not os.path.isdir(dst):  # Если директория
         print(os.path.isdir(name_dir) and not os.path.isdir(dst))  # существует
         os.makedirs(dst)                  # но нет директории с номером версии
