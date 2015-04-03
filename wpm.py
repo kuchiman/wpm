@@ -232,7 +232,7 @@ def createParser():
 
     show_parser = subparsers.add_parser('show')
     list_parser.add_argument('what',
-        choices=[], nargs='?')
+        choices=['config'], nargs='?')
 
     return parser
 
