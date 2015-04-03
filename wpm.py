@@ -47,7 +47,7 @@ def read_config():
     config = configparser.ConfigParser()
     config.read('config.ini')
 
-    if config.has_section('REPOSITORY') and config.has_option('REPOSITORY', 'dir'):
+    if 'REPOSITORY' in config and 'dir' in config['REPOSITORY']:
         REPO_DIR = config.get('REPOSITORY', 'dir')
     else:
         print('Конфигурационный файл повреждён!! Не указан адрес репозитория')
