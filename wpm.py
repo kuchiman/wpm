@@ -28,10 +28,11 @@ def cache_check():
         os.makedirs(CACHE_DIR)          # Создана директория
         open(CACHEINDEX, 'a').close()   # Создан пустой индекс
         print('Кэш создан...')
-    elif not os.path.isfile(CACHEINDEX):
-        open(CACHEINDEX, 'a').close()
     else:
-        print('Кэш доступен...')
+        if not os.path.isfile(CACHEINDEX):
+            open(CACHEINDEX, 'a').close()
+            print("Создан индекс...")
+    print('Кэш доступен...')
 
 
 def read_config():
