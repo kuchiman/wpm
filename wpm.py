@@ -90,22 +90,20 @@ def change_index(action, pkg_name):
     а второй запись о пакете вида ("имя", "версия")"""
     global CACHEPKGLIST
 
-    if action == 'delete':  # Удаление записи о пакете
-        CACHEPKGLIST.remove_section(pkg_name)
+    if action == 'delete':               # Удаление записи о пакете
+        del CACHEPKGLIST[pkg_name]
     elif action == 'write':              # Добавление записи о пакете
-        CACHEPKGLIST.add_section(pkg_name)
-        CACHEPKGLIST.set(pkg_name, 'version',
-            PKGLIST.get(pkg_name, 'version'))
-        CACHEPKGLIST.set(pkg_name, 'file', PKGLIST.get(pkg_name, 'file'))
+        CACHEPKGLIST[pkg_name] = {}
+        CACHEPKGLIST[pkg_name]['version'] = PKGLIST[pkg_name]['version']
+        CACHEPKGLIST[pkg_name]['file'] = PKGLIST[pkg_name]['file']
     elif action == 'update':             # Обновление записи о пакете
-        CACHEPKGLIST.set(pkg_name, 'version',
-            PKGLIST.get(pkg_name, 'version'))
-        CACHEPKGLIST.set(pkg_name, 'file', PKGLIST.get(pkg_name, 'file'))
+        CACHEPKGLIST[pkg_name]['version'] = PKGLIST[pkg_name]['version']
+        CACHEPKGLIST[pkg_name]['file'] = PKGLIST[pkg_name]['file']
 
 
 def write_index():
     """Запись локального файла индекса"""
-    with open(CACHEINDEX, 'wb') as indexfile:
+    with open(CACHEINDEX, 'w') as indexfile:
         CACHEPKGLIST.write(indexfile)
 
 
@@ -113,23 +111,23 @@ def pkgs_list():
     """Функция выводит список доступных в репозитории пакетов"""
     print("\n\nИмя       \t\t\t| Версия")
     for pkg_name in PKGLIST.sections():
-        print(pkg_name + "\t\t\t| " + PKGLIST.get(pkg_name, 'version'))
+        print(pkg_name + "\t\t\t| " + PKGLIST[pkg_name]['version'])
 
 
 def pkgs_list_installed():
     """Функция выводит список установленных пакетов"""
     print("\n\nИмя       \t\t\t| Версия")
     for pkg_name in CACHEPKGLIST.sections():
-        print(pkg_name + "\t\t\t| " + CACHEPKGLIST.get(pkg_name, 'version'))
+        print(pkg_name + "\t\t\t| " + CACHEPKGLIST[pkg_name]['version'])
 
 
 def pkgs_list_updated():
     """Функция выводит список установленных пакетов"""
     print("\n\nИмя       \t\t\t| Установлено   \t| Доступно     \t")
     for pkg_name in CACHEPKGLIST.sections():
-        if PKGLIST.has_section(pkg_name):
-            cachepkg_version = CACHEPKGLIST.get(pkg_name, 'version')
-            pkg_version = PKGLIST.get(pkg_name, 'version')
+        if pkg_name in PKGLIST:
+            cachepkg_version = CACHEPKGLIST[pkg_name]['version']
+            pkg_version = PKGLIST[pkg_name]['version']
             if cachepkg_version < pkg_version:
                 print(pkg_name + "\t\t\t| " +
                     cachepkg_version + "\t| " + pkg_version)
@@ -137,8 +135,8 @@ def pkgs_list_updated():
 
 def pkg_download(pkg_name):
     """Функция загружает пакет из репозитория в кэш"""
-    pkg_version = PKGLIST.get(pkg_name, 'version')
-    pkg_file = PKGLIST.get(pkg_name, 'file')
+    pkg_version = PKGLIST[pkg_name]['version']
+    pkg_file = PKGLIST[pkg_name]['file']
     src = os.path.join('', REPO_DIR, pkg_file)
     name_dir = os.path.join('', CACHE_DIR, pkg_name)
     dst = os.path.join('', name_dir, pkg_version)
@@ -158,25 +156,25 @@ def pkg_download(pkg_name):
 
 def pkg_install(pkg_name):
     """Функция устанавливает пакет с указанным именем."""
-    if CACHEPKGLIST.has_section(pkg_name):
-        cachepkg_version = CACHEPKGLIST.get(pkg_name, 'version')
+    if pkg_name in CACHEPKGLIST:
+        cachepkg_version = CACHEPKGLIST[pkg_name]['version']
     else:
         cachepkg_version = '0'
 
-    if PKGLIST.has_section(pkg_name):         # Проверяем есть ли такой в репах
-        pkg_version = PKGLIST.get(pkg_name, 'version')  # Какая версия в репах
+    if pkg_name in PKGLIST:                   # Проверяем есть ли такой в репах
+        pkg_version = PKGLIST[pkg_name]['version']  # Какая версия в репах
     else:
         print(pkg_name + " Пакет с таким именет отсутствует!!")
         return 0
 
     # Проверка не установлен ли уже пакет
-    if CACHEPKGLIST.has_section(pkg_name):
+    if pkg_name in CACHEPKGLIST:
         if cachepkg_version == pkg_version:
             print(pkg_name + " Пакет уже установлен и это последняя версия!!")
             return 0
         elif cachepkg_version < pkg_version:
             print("Пакет будет обновлён")
-            pkg_download(pkg_name, pkg_version)
+            pkg_download(pkg_name)
             p = subprocess.call(['python',
                 os.path.join('', CACHE_DIR, pkg_name, pkg_version, 'script.py'),
                 'install'], stdout=subprocess.PIPE)
@@ -199,8 +197,8 @@ def pkgs_install(packages):
 
 def pkg_remove(pkg_name):
     """Функция удаляет ранее установленный пакет"""
-    if CACHEPKGLIST.has_section(pkg_name):  # Проверяем есть ли такой
-        pkg_version = CACHEPKGLIST.get(pkg_name, 'version')
+    if pkg_name in CACHEPKGLIST:                    # Проверяем есть ли такой
+        pkg_version = CACHEPKGLIST[pkg_name]['version']
     else:
         print(pkg_name + " Пакет с таким именет отсутствует!!")
         return 0
