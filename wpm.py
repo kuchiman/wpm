@@ -74,17 +74,17 @@ def change_index(action, pkg_name):
     а второй запись о пакете вида ("имя", "версия")"""
     global CACHEPKGLIST
 
-    if action == 'delete' and tmp >= 0:  # Удаление записи о пакете
-        del CACHEPKGLIST.remove_section(pkg_name)
+    if action == 'delete':  # Удаление записи о пакете
+        CACHEPKGLIST.remove_section(pkg_name)
     elif action == 'write':              # Добавление записи о пакете
-            CACHEPKGLIST.add_section(pkg_name)
-            CACHEPKGLIST.set(pkg_name, 'version',
-                PKGLIST.get(pkg_name, 'version'))
-            CACHEPKGLIST.set(pkg_name, 'file', PKGLIST.get(pkg_name, 'file'))
+        CACHEPKGLIST.add_section(pkg_name)
+        CACHEPKGLIST.set(pkg_name, 'version',
+            PKGLIST.get(pkg_name, 'version'))
+        CACHEPKGLIST.set(pkg_name, 'file', PKGLIST.get(pkg_name, 'file'))
     elif action == 'update':             # Обновление записи о пакете
-            CACHEPKGLIST.set(pkg_name, 'version',
-                PKGLIST.get(pkg_name, 'version'))
-            CACHEPKGLIST.set(pkg_name, 'file', PKGLIST.get(pkg_name, 'file'))
+        CACHEPKGLIST.set(pkg_name, 'version',
+            PKGLIST.get(pkg_name, 'version'))
+        CACHEPKGLIST.set(pkg_name, 'file', PKGLIST.get(pkg_name, 'file'))
 
 
 def write_index():
