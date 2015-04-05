@@ -166,6 +166,8 @@ def pkg_install(pkg_name):
         print(pkg_name + " Пакет с таким именет отсутствует!!")
         return 0
 
+    soft_dir = os.path.join('', CACHE_DIR, pkg_name, pkg_version)
+
     # Проверка не установлен ли уже пакет
     if pkg_name in CACHEPKGLIST:
         if cachepkg_version == pkg_version:
@@ -175,15 +177,15 @@ def pkg_install(pkg_name):
             print("Пакет будет обновлён")
             pkg_download(pkg_name)
             p = subprocess.call(['python',
-                os.path.join('', CACHE_DIR, pkg_name, pkg_version, 'script.py'),
-                'install'], stdout=subprocess.PIPE)
+                os.path.join('', soft_dir, 'script.py'),
+                'install'], shell=False, stdout=subprocess.PIPE)
             change_index('update', pkg_name)
     else:
         print("Пакет будет установлен")
         pkg_download(pkg_name)
         p = subprocess.call(['python',
-            os.path.join('', CACHE_DIR, pkg_name, pkg_version, 'script.py'),
-            'install'], stdout=subprocess.PIPE)
+            os.path.join('', soft_dir, 'script.py'),
+            'install'], shell=False, stdout=subprocess.PIPE)
         change_index('write', pkg_name)
 
 
@@ -197,15 +199,16 @@ def pkgs_install(packages):
 def pkg_remove(pkg_name):
     """Функция удаляет ранее установленный пакет"""
     if pkg_name in CACHEPKGLIST:                    # Проверяем есть ли такой
-        pkg_version = CACHEPKGLIST[pkg_name]['version']
+        cachepkg_version = CACHEPKGLIST[pkg_name]['version']
     else:
         print(pkg_name + " Пакет с таким именет отсутствует!!")
         return 0
 
-    subprocess.call(['python',
-        os.path.join('', CACHE_DIR, pkg_name, pkg_version, 'script.py'),
-        'remove'], shell=True, stdout=subprocess.PIPE)
-    shutil.rmtree(os.path.join('', CACHE_DIR, pkg_name, pkg_version))
+    soft_dir = os.path.join('', CACHE_DIR, pkg_name, cachepkg_version)
+
+    subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
+        'remove'], shell=False, stdout=subprocess.PIPE)
+    shutil.rmtree(soft_dir)
     change_index('delete', pkg_name)
 
 
