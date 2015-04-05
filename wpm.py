@@ -178,14 +178,14 @@ def pkg_install(pkg_name):
             pkg_download(pkg_name)
             p = subprocess.call(['python',
                 os.path.join('', soft_dir, 'script.py'),
-                'install'], shell=False, stdout=subprocess.PIPE)
+                'install'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
             change_index('update', pkg_name)
     else:
         print("Пакет будет установлен")
         pkg_download(pkg_name)
         p = subprocess.call(['python',
             os.path.join('', soft_dir, 'script.py'),
-            'install'], shell=False, stdout=subprocess.PIPE)
+            'install'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
         change_index('write', pkg_name)
 
 
@@ -207,7 +207,7 @@ def pkg_remove(pkg_name):
     soft_dir = os.path.join('', CACHE_DIR, pkg_name, cachepkg_version)
 
     subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
-        'remove'], shell=False, stdout=subprocess.PIPE)
+        'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
     shutil.rmtree(soft_dir)
     change_index('delete', pkg_name)
 
