@@ -1,4 +1,9 @@
-import os, sys, re, argparse, shutil, subprocess, configparser
+import os
+import sys
+import argparse
+import shutil
+import subprocess
+import configparser
 
 REPO_DIR = ''                                 # Адрес сетевого репозитория
 CACHE_DIR = ''                                # Адрес локального кэша
@@ -8,7 +13,7 @@ CACHEINDEX = ''                               # Адрес локального 
 
 PKGLIST = configparser.ConfigParser()         # Список доступных пакетов
 CACHEPKGLIST = configparser.ConfigParser()    # Список установленных пакетов
-##test
+
 
 def repo_check():
     """Функция проверяет доступность директории с пакетами"""
