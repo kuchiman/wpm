@@ -57,7 +57,7 @@ class LocalRepo(Repo):
                 cachepkg_version = self.PKGLIST[pkg_name]['version']
                 if cachepkg_version < pkg_version:
                     PKGUP.append(pkg_name, cachepkg_version,
-                        pkg_version, repo.NAME)
+                        pkg_version)
         return PKGUP
 
     def write_index(self):
@@ -183,10 +183,34 @@ def read_config():
 
 def show_config(repo):
     """Функция выводит переменные"""
+    print("Имя репозитория" + repo.NAME)
     print("Адрес репозитория " + repo.REPO_DIR)
     print("Индекс репозитория" + repo.INDEX)
     print("Доступные пакеты")
     print(repo.list())
+
+
+def pkgs_list_installed(localrepo):
+    print("\tУстановлены следующие пакеты.")
+    print("-" * 80)
+    print(localrepo.NAME)
+    print("-" * 80)
+    print("\tПакет\t\t\tТекущая версия")
+    for pkg in localrepo.list():
+        print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+    print("-" * 80)
+
+
+def pkgs_list_updated(localrepo, repos):
+    print("\tДоступны следующие обновления.")
+    print("-" * 80)
+    for repo in repos:
+        print(repo.NAME)
+        print("-" * 80)
+        print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
+        for pkg in localrepo.list_updated(repo):
+            print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
+        print("-" * 80)
 
 
 def createParser():
