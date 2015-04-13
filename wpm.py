@@ -15,29 +15,153 @@ PKGLIST = configparser.ConfigParser()         # Список доступных 
 CACHEPKGLIST = configparser.ConfigParser()    # Список установленных пакетов
 
 
-def repo_check():
-    """Функция проверяет доступность директории с пакетами"""
-    if not os.path.isdir(REPO_DIR):
-        print(REPO_DIR + 'Репозиторий не доступен!!')
-        raise SystemExit(1)
-    elif not os.path.isfile(INDEX):
-        print('Отсутствует индекс!!')
-        raise SystemExit(1)
-    else:
-        print('Репозиторий доступен...')
+class Repo():
+    REPO_DIR = ''
+    INDEX = ''
+    PKGLIST = configparser.ConfigParser()
+
+    def __init__(self, repo_dir):
+        super(Repo, self).__init__()
+        self.REPO_DIR = repo_dir
+        self.INDEX = os.path.join('', REPO_DIR, 'index.ini')
+        if self.repo_check() == 0:
+            self.PKGLIST.read(INDEX)
+
+    def repo_check(self):
+        """Функция проверяет доступность директории с пакетами"""
+        if not os.path.isdir(REPO_DIR):  # Репозиторий не доступен
+            return 1
+        elif not os.path.isfile(INDEX):  # Отсутствует индекс
+            return 2
+        else:  # Репозиторий доступен
+            return 0
+
+    def list(self):
+        """Функция возвращает список доступных в репозитории пакетов"""
+        PKGS = []
+        for pkg_name in self.PKGLIST.sections():
+            PKGS.append(pkg_name, self.PKGLIST[pkg_name]['version'])
+        return PKGS
 
 
-def cache_check():
-    """Функция проверяет наличие файла индекса"""
-    if not os.path.isdir(CACHE_DIR):
-        os.makedirs(CACHE_DIR)          # Создана директория
-        open(CACHEINDEX, 'w+').close()   # Создан пустой индекс
-        print('Кэш создан...')
-    else:
-        if not os.path.isfile(CACHEINDEX):
-            open(CACHEINDEX, 'w+').close()
-            print("Создан индекс...")
-    print('Кэш доступен...')
+class LocalRepo(Repo):
+
+    def __init__(self):
+        super(LocalRepo, self).__init__()
+
+    def repo_check(self):
+        """Функция проверяет наличие файла индекса"""
+        if not os.path.isdir(CACHE_DIR):
+            os.makedirs(CACHE_DIR)          # Создана директория
+            open(CACHEINDEX, 'w+').close()   # Создан пустой индекс
+        else:
+            if not os.path.isfile(CACHEINDEX):
+                open(CACHEINDEX, 'w+').close()
+        return 0
+
+    def list_updated(self, repo):
+        """Функция выводит список доступных для обновления пакетов"""
+        PKGUP = []
+
+        for pkg_name, pkg_version in repo.list():
+            if pkg_name in self.PKGLIST:
+                cachepkg_version = self.PKGLIST[pkg_name]['version']
+                if cachepkg_version < pkg_version:
+                    PKGUP.append(pkg_name, cachepkg_version,
+                        pkg_version, repo.REPO_DIR)
+        return PKGUP
+
+    def write_index(self):
+        """Запись локального файла индекса"""
+        with open(INDEX, 'w') as indexfile:
+            self.PKGLIST.write(indexfile)
+
+    def change_index(self, action, pkg_name, repo=None):
+        """Функция добавляет или удаляет запись о пакете в системной
+        переменной(не в файле индекса) Первый аргумент это необходимое действие
+        а второй запись о пакете вида ("имя", "версия")"""
+
+        if action == 'delete':               # Удаление записи о пакете
+            del self.PKGLIST[pkg_name]
+        elif action == 'write':              # Добавление записи о пакете
+            self.PKGLIST[pkg_name] = {}
+            self.PKGLIST[pkg_name]['version'] = repo.PKGLIST[pkg_name]['version']
+            self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
+        elif action == 'update':             # Обновление записи о пакете
+            self.PKGLIST[pkg_name]['version'] = repo.PKGLIST[pkg_name]['version']
+            self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
+
+    def pkg_download(self, pkg_name, repo):
+        """Функция загружает пакет из репозитория в кэш"""
+        pkg_version = repo.PKGLIST[pkg_name]['version']
+        pkg_file = repo.PKGLIST[pkg_name]['file']
+        src = os.path.join('', repo.REPO_DIR, pkg_file)
+        name_dir = os.path.join('', self.REPO_DIR, pkg_name)
+        dst = os.path.join('', name_dir, pkg_version)
+
+        if not os.path.isdir(name_dir):
+            # Если директория для пакета не существует
+            os.makedirs(name_dir)
+            os.makedirs(dst)
+        elif os.path.isdir(name_dir) and not os.path.isdir(dst):
+            # Если директория существует но нет директории с номером версии
+            print(os.path.isdir(name_dir) and not os.path.isdir(dst))
+            os.makedirs(dst)
+        else:  # Если путь существует значит там что то лежит, удалить всё
+            shutil.rmtree(dst)
+            os.makedirs(dst)
+
+        shutil.unpack_archive(src, dst, 'zip')
+
+    def pkg_install(self, pkg_name, repo):
+        """Функция устанавливает пакет с указанным именем."""
+        if pkg_name in self.PKGLIST:
+            cachepkg_version = self.PKGLIST[pkg_name]['version']
+        else:
+            cachepkg_version = '0'
+
+        if pkg_name in repo.PKGLIST:   # Проверяем есть ли такой в репах
+            pkg_version = repo.PKGLIST[pkg_name]['version']
+        else:
+            return 1
+
+        soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+
+        # Проверка не установлен ли уже пакет
+        if pkg_name in self.PKGLIST:
+            if cachepkg_version == pkg_version:
+                return 2  # Уже установлен
+            elif cachepkg_version < pkg_version:
+                self.pkg_download(pkg_name, repo)
+                p = subprocess.call(['python',
+                    os.path.join('', soft_dir, 'script.py'), 'install'],
+                    shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+                self.change_index('update', pkg_name, repo)
+                return 3  # Обновлён
+        else:
+            print("Пакет будет установлен")
+            self.pkg_download(pkg_name, repo)
+            p = subprocess.call(['python',
+                os.path.join('', soft_dir, 'script.py'), 'install'],
+                shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+            self.change_index('write', pkg_name, repo)
+            return 4  # Установлен
+
+    def pkg_remove(self, pkg_name):
+        """Функция удаляет ранее установленный пакет"""
+        if pkg_name in self.PKGLIST:                  # Проверяем есть ли такой
+            pkg_version = self.PKGLIST[pkg_name]['version']
+        else:
+            return 1
+
+        soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+
+        subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
+            'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+        shutil.rmtree(soft_dir)
+        self.change_index('delete', pkg_name)
+
+
 
 
 def read_config():
@@ -86,142 +210,6 @@ def show_config():
     print(PKGLIST.sections())
     print("Установленные пакеты")
     print(CACHEPKGLIST.sections())
-
-
-def change_index(action, pkg_name):
-    """Функция добавляет или удаляет запись о пакете в системной
-    переменной(не в файле индекса) Первый аргумент это необходимое действие
-    а второй запись о пакете вида ("имя", "версия")"""
-    global CACHEPKGLIST
-
-    if action == 'delete':               # Удаление записи о пакете
-        del CACHEPKGLIST[pkg_name]
-    elif action == 'write':              # Добавление записи о пакете
-        CACHEPKGLIST[pkg_name] = {}
-        CACHEPKGLIST[pkg_name]['version'] = PKGLIST[pkg_name]['version']
-        CACHEPKGLIST[pkg_name]['file'] = PKGLIST[pkg_name]['file']
-    elif action == 'update':             # Обновление записи о пакете
-        CACHEPKGLIST[pkg_name]['version'] = PKGLIST[pkg_name]['version']
-        CACHEPKGLIST[pkg_name]['file'] = PKGLIST[pkg_name]['file']
-
-
-def write_index():
-    """Запись локального файла индекса"""
-    with open(CACHEINDEX, 'w') as indexfile:
-        CACHEPKGLIST.write(indexfile)
-
-
-def pkgs_list():
-    """Функция выводит список доступных в репозитории пакетов"""
-    print("\n\nИмя       \t\t\t| Версия")
-    for pkg_name in PKGLIST.sections():
-        print(pkg_name + "\t\t\t| " + PKGLIST[pkg_name]['version'])
-
-
-def pkgs_list_installed():
-    """Функция выводит список установленных пакетов"""
-    print("\n\nИмя       \t\t\t| Версия")
-    for pkg_name in CACHEPKGLIST.sections():
-        print(pkg_name + "\t\t\t| " + CACHEPKGLIST[pkg_name]['version'])
-
-
-def pkgs_list_updated():
-    """Функция выводит список установленных пакетов"""
-    print("\n\nИмя       \t\t\t| Установлено   \t| Доступно     \t")
-    for pkg_name in CACHEPKGLIST.sections():
-        if pkg_name in PKGLIST:
-            cachepkg_version = CACHEPKGLIST[pkg_name]['version']
-            pkg_version = PKGLIST[pkg_name]['version']
-            if cachepkg_version < pkg_version:
-                print(pkg_name + "\t\t\t| " +
-                    cachepkg_version + "\t| " + pkg_version)
-
-
-def pkg_download(pkg_name):
-    """Функция загружает пакет из репозитория в кэш"""
-    pkg_version = PKGLIST[pkg_name]['version']
-    pkg_file = PKGLIST[pkg_name]['file']
-    src = os.path.join('', REPO_DIR, pkg_file)
-    name_dir = os.path.join('', CACHE_DIR, pkg_name)
-    dst = os.path.join('', name_dir, pkg_version)
-
-    if not os.path.isdir(name_dir):  # Если директория для пакета не существует
-        os.makedirs(name_dir)
-        os.makedirs(dst)
-    elif os.path.isdir(name_dir) and not os.path.isdir(dst):  # Если директория
-        print(os.path.isdir(name_dir) and not os.path.isdir(dst))  # существует
-        os.makedirs(dst)                  # но нет директории с номером версии
-    else:       # Если путь существует значит там что то лежит, удалить всё
-        shutil.rmtree(dst)
-        os.makedirs(dst)
-
-    shutil.unpack_archive(src, dst, 'zip')
-
-
-def pkg_install(pkg_name):
-    """Функция устанавливает пакет с указанным именем."""
-    if pkg_name in CACHEPKGLIST:
-        cachepkg_version = CACHEPKGLIST[pkg_name]['version']
-    else:
-        cachepkg_version = '0'
-
-    if pkg_name in PKGLIST:                   # Проверяем есть ли такой в репах
-        pkg_version = PKGLIST[pkg_name]['version']  # Какая версия в репах
-    else:
-        print(pkg_name + " Пакет с таким именет отсутствует!!")
-        return 0
-
-    soft_dir = os.path.join('', CACHE_DIR, pkg_name, pkg_version)
-
-    # Проверка не установлен ли уже пакет
-    if pkg_name in CACHEPKGLIST:
-        if cachepkg_version == pkg_version:
-            print(pkg_name + " Пакет уже установлен и это последняя версия!!")
-            return 0
-        elif cachepkg_version < pkg_version:
-            print("Пакет будет обновлён")
-            pkg_download(pkg_name)
-            p = subprocess.call(['python',
-                os.path.join('', soft_dir, 'script.py'),
-                'install'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
-            change_index('update', pkg_name)
-    else:
-        print("Пакет будет установлен")
-        pkg_download(pkg_name)
-        p = subprocess.call(['python',
-            os.path.join('', soft_dir, 'script.py'),
-            'install'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
-        change_index('write', pkg_name)
-
-
-def pkgs_install(packages):
-    """Функция групповой установки пакетов"""
-    for pkg_name in packages:
-        pkg_install(pkg_name)
-    write_index()
-
-
-def pkg_remove(pkg_name):
-    """Функция удаляет ранее установленный пакет"""
-    if pkg_name in CACHEPKGLIST:                    # Проверяем есть ли такой
-        cachepkg_version = CACHEPKGLIST[pkg_name]['version']
-    else:
-        print(pkg_name + " Пакет с таким именет отсутствует!!")
-        return 0
-
-    soft_dir = os.path.join('', CACHE_DIR, pkg_name, cachepkg_version)
-
-    subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
-        'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
-    shutil.rmtree(soft_dir)
-    change_index('delete', pkg_name)
-
-
-def pkgs_remove(packages):
-    """Функция группового удаления"""
-    for pkg_name in packages:
-        pkg_remove(pkg_name)
-    write_index()
 
 
 def createParser():
