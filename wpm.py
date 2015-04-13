@@ -16,13 +16,15 @@ CACHEPKGLIST = configparser.ConfigParser()    # Список установле�
 
 
 class Repo():
+    NAME = ''
     REPO_DIR = ''
     INDEX = ''
     PKGLIST = configparser.ConfigParser()
 
-    def __init__(self, repo_dir):
+    def __init__(self, name, repo_dir):
         super(Repo, self).__init__()
         self.REPO_DIR = repo_dir
+        self.NAME = name
         self.INDEX = os.path.join('', REPO_DIR, 'index.ini')
         if self.repo_check() == 0:
             self.PKGLIST.read(INDEX)
@@ -33,7 +35,7 @@ class Repo():
             return 1
         elif not os.path.isfile(INDEX):  # Отсутствует индекс
             return 2
-        else:  # Репозиторий доступен
+        else:                            # Репозиторий доступен
             return 0
 
     def list(self):
@@ -45,14 +47,10 @@ class Repo():
 
 
 class LocalRepo(Repo):
-
-    def __init__(self):
-        super(LocalRepo, self).__init__()
-
     def repo_check(self):
         """Функция проверяет наличие файла индекса"""
         if not os.path.isdir(CACHE_DIR):
-            os.makedirs(CACHE_DIR)          # Создана директория
+            os.makedirs(CACHE_DIR)           # Создана директория
             open(CACHEINDEX, 'w+').close()   # Создан пустой индекс
         else:
             if not os.path.isfile(CACHEINDEX):
@@ -68,7 +66,7 @@ class LocalRepo(Repo):
                 cachepkg_version = self.PKGLIST[pkg_name]['version']
                 if cachepkg_version < pkg_version:
                     PKGUP.append(pkg_name, cachepkg_version,
-                        pkg_version, repo.REPO_DIR)
+                        pkg_version, repo.NAME)
         return PKGUP
 
     def write_index(self):
@@ -160,14 +158,14 @@ class LocalRepo(Repo):
             'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
         shutil.rmtree(soft_dir)
         self.change_index('delete', pkg_name)
+        return 0
 
 
 
 
 def read_config():
-    """Функция читает конфиг и инициализирует глобальные переменные"""
-
-    global REPO_DIR, CACHE_DIR, INDEX, CACHEINDEX, PKGLIST, CACHEPKGLIST
+    """Функция читает конфиг и инициализирует переменные"""
+    repos = []
 
     if not os.path.isfile('config.ini'):
         print('Отсутствует конфигурационный файл!!')
@@ -176,26 +174,20 @@ def read_config():
     config = configparser.ConfigParser()
     config.read('config.ini')
 
-    if 'REPOSITORY' in config and 'dir' in config['REPOSITORY']:
-        REPO_DIR = config['REPOSITORY']['dir']
+    if 'REPOSITORY' in config:
+        for name in config['REPOSITORY']:
+            repos.append(Repo(name, config['REPOSITORY'][name]))
     else:
         print('Конфигурационный файл повреждён!! Не указан адрес репозитория')
         raise SystemExit(1)
 
     if 'CACHE' in config and 'dir' in config['CACHE']:
-        CACHE_DIR = config['CACHE']['dir']
+        localrepo = LocalRepo('local', config['CACHE']['dir'])
     else:
         print('Конфигурационный файл повреждён!! Не указан адрес кэша')
         raise SystemExit(1)
 
-    INDEX = os.path.join('', REPO_DIR, 'index.ini')
-    CACHEINDEX = os.path.join('', CACHE_DIR, 'index.ini')
-
-    repo_check()
-    cache_check()
-
-    PKGLIST.read(INDEX)
-    CACHEPKGLIST.read(CACHEINDEX)
+    return localrepo, repos
 
 
 def show_config():
@@ -238,7 +230,7 @@ if __name__ == "__main__":
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
 
-    read_config()
+    localrepo, repos = read_config()
 
     if namespace.command == "list":
         if namespace.what is None:
