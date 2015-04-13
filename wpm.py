@@ -5,15 +5,6 @@ import shutil
 import subprocess
 import configparser
 
-REPO_DIR = ''                                 # Адрес сетевого репозитория
-CACHE_DIR = ''                                # Адрес локального кэша
-
-INDEX = ''                                    # Адрес индекса репозитория
-CACHEINDEX = ''                               # Адрес локального индекса
-
-PKGLIST = configparser.ConfigParser()         # Список доступных пакетов
-CACHEPKGLIST = configparser.ConfigParser()    # Список установленных пакетов
-
 
 class Repo():
     NAME = ''
@@ -25,17 +16,17 @@ class Repo():
         super(Repo, self).__init__()
         self.REPO_DIR = repo_dir
         self.NAME = name
-        self.INDEX = os.path.join('', REPO_DIR, 'index.ini')
+        self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         if self.repo_check() == 0:
-            self.PKGLIST.read(INDEX)
+            self.PKGLIST.read(self.INDEX)
 
     def repo_check(self):
         """Функция проверяет доступность директории с пакетами"""
-        if not os.path.isdir(REPO_DIR):  # Репозиторий не доступен
+        if not os.path.isdir(self.REPO_DIR):  # Репозиторий не доступен
             return 1
-        elif not os.path.isfile(INDEX):  # Отсутствует индекс
+        elif not os.path.isfile(self.INDEX):  # Отсутствует индекс
             return 2
-        else:                            # Репозиторий доступен
+        else:                                 # Репозиторий доступен
             return 0
 
     def list(self):
@@ -49,12 +40,12 @@ class Repo():
 class LocalRepo(Repo):
     def repo_check(self):
         """Функция проверяет наличие файла индекса"""
-        if not os.path.isdir(CACHE_DIR):
-            os.makedirs(CACHE_DIR)           # Создана директория
-            open(CACHEINDEX, 'w+').close()   # Создан пустой индекс
+        if not os.path.isdir(self.REPO_DIR):
+            os.makedirs(self.REPO_DIR)           # Создана директория
+            open(self.INDEX, 'w+').close()   # Создан пустой индекс
         else:
-            if not os.path.isfile(CACHEINDEX):
-                open(CACHEINDEX, 'w+').close()
+            if not os.path.isfile(self.INDEX):
+                open(self.INDEX, 'w+').close()
         return 0
 
     def list_updated(self, repo):
@@ -71,7 +62,7 @@ class LocalRepo(Repo):
 
     def write_index(self):
         """Запись локального файла индекса"""
-        with open(INDEX, 'w') as indexfile:
+        with open(self.INDEX, 'w') as indexfile:
             self.PKGLIST.write(indexfile)
 
     def change_index(self, action, pkg_name, repo=None):
@@ -190,18 +181,12 @@ def read_config():
     return localrepo, repos
 
 
-def show_config():
-    """Функция выводит глобальные переменные"""
-    print("Адрес репозитория " + REPO_DIR)
-    print("Адрес кэша" + CACHE_DIR)
-    print("Индекс репозитория" + INDEX)
-    print("Индекс кэша" + CACHEINDEX)
-    #print("Доступные пакеты" + PKGLIST.sectons())
-    #print("Установленные пакеты" + CACHEPKGLIST.sectons())
+def show_config(repo):
+    """Функция выводит переменные"""
+    print("Адрес репозитория " + repo.REPO_DIR)
+    print("Индекс репозитория" + repo.INDEX)
     print("Доступные пакеты")
-    print(PKGLIST.sections())
-    print("Установленные пакеты")
-    print(CACHEPKGLIST.sections())
+    print(repo.list())
 
 
 def createParser():
