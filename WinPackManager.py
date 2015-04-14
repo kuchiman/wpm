@@ -17,6 +17,12 @@ class Repo():
         if self.repo_check() == 0:
             self.PKGLIST.read(self.INDEX)
 
+    def __repr__(self):
+        return self.NAME
+
+    def __str__(self):
+        return self.NAME
+
     def repo_check(self):
         """Функция проверяет доступность директории с пакетами"""
         if not os.path.isdir(self.REPO_DIR):  # Репозиторий не доступен
