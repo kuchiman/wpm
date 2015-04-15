@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import configparser
 
+
 class Repo():
     NAME = ''
     REPO_DIR = ''
@@ -43,6 +44,7 @@ class Repo():
         if pkg_name in self.PKGLIST:
             return pkg_name, self.PKGLIST[pkg_name]['version']
         return 0
+
 
 class LocalRepo(Repo):
     def repo_check(self):

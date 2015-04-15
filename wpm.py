@@ -86,14 +86,20 @@ def pkgs_remove(localrepo, pkgs):
 def pkgs_install(localrepo, repos, pkgs):
     for pkg in pkgs:
         pkg_in = []
+
         for r in repos:
             if r.search(pkg):
-                pkg_in.append(r.NAME, pkg, r.search(pkg)[1])
+                pkg_in.append(r)
+
         if len(pkg_in) > 1:
             print("Пакет писутствует в нескольких репозиториях!!")
             for i in pkg_in:
-                print()
-
+                print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg)[1])
+        elif len(pkg_in) == 0:
+            print("Пакет " + pkg + "не найден")
+        else:
+            print("Пакет " + pkg + "устанавливается")
+            localrepo.pkg_install(pkg, pkg_in[0])
 
 
 def createParser():
