@@ -33,7 +33,7 @@ def read_config():
     print("Адрес репозитория " + localrepo.REPO_DIR)
     print("Индекс репозитория " + localrepo.INDEX)
     print("Доступные пакеты")
-    print(repo.list())
+    print(localrepo.list())
 
     return localrepo, repos
 
