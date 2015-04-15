@@ -29,14 +29,20 @@ def read_config():
         print('Конфигурационный файл повреждён!! Не указан адрес кэша')
         raise SystemExit(1)
 
+    print("Имя репозитория " + localrepo.NAME)
+    print("Адрес репозитория " + localrepo.REPO_DIR)
+    print("Индекс репозитория " + localrepo.INDEX)
+    print("Доступные пакеты")
+    print(repo.list())
+
     return localrepo, repos
 
 
 def show_config(repo):
     """Функция выводит переменные"""
-    print("Имя репозитория" + repo.NAME)
+    print("Имя репозитория " + repo.NAME)
     print("Адрес репозитория " + repo.REPO_DIR)
-    print("Индекс репозитория" + repo.INDEX)
+    print("Индекс репозитория " + repo.INDEX)
     print("Доступные пакеты")
     print(repo.list())
 
