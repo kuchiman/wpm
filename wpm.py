@@ -132,7 +132,7 @@ if __name__ == "__main__":
         if namespace.what is None:
             pkgs_list(repos)
         elif namespace.what == 'installed':
-            pkgs_list_installed()
+            pkgs_list_installed(localrepo)
         elif namespace.what == 'updated':
             pkgs_list_updated(localrepo, repos)
     elif namespace.command == "show":
