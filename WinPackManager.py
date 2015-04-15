@@ -36,7 +36,7 @@ class Repo():
     def list(self):
         """Функция возвращает список доступных в репозитории пакетов"""
         PKGS = []
-        for pkg_name in self.PKGLIST:
+        for pkg_name in self.PKGLIST.sections():
             print(pkg_name)
             PKGS.append((pkg_name, self.PKGLIST[pkg_name]['version']))
         return PKGS
