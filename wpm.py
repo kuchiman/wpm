@@ -42,6 +42,18 @@ def show_config(repo):
     print(repo.list())
 
 
+def pkgs_list(repos):
+    print("\tДоступны следующие пакеты.")
+    print("-" * 80)
+    for repo in repos:
+        print(repo.NAME)
+        print("-" * 80)
+        print("\tПакет\t\t\tДоступная версия")
+        for pkg in repo.list():
+            print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+        print("-" * 80)
+
+
 def pkgs_list_installed(localrepo):
     print("\tУстановлены следующие пакеты.")
     print("-" * 80)
@@ -63,6 +75,25 @@ def pkgs_list_updated(localrepo, repos):
         for pkg in localrepo.list_updated(repo):
             print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
         print("-" * 80)
+
+
+def pkgs_remove(localrepo, pkgs):
+    for pkg in pkgs:
+        if localrepo.pkg_remove(pkg):
+            print("Пакет " + pkg + " не найден!!")
+
+
+def pkgs_install(localrepo, repos, pkgs):
+    for pkg in pkgs:
+        pkg_in = []
+        for r in repos:
+            if r.search(pkg):
+                pkg_in.append(r.NAME, pkg, r.search(pkg)[1])
+        if len(pkg_in) > 1:
+            print("Пакет писутствует в нескольких репозиториях!!")
+            for i in pkg_in:
+                print()
+
 
 
 def createParser():
@@ -90,20 +121,19 @@ def createParser():
 if __name__ == "__main__":
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
-
     localrepo, repos = read_config()
 
     if namespace.command == "list":
         if namespace.what is None:
-            pkgs_list()
+            pkgs_list(repos)
         elif namespace.what == 'installed':
             pkgs_list_installed()
         elif namespace.what == 'updated':
             pkgs_list_updated(localrepo, repos)
     elif namespace.command == "show":
         if namespace.what is None:
-            show_config()
+            show_config(localrepo)
     elif namespace.command == "install":
-        pkgs_install(namespace.packages)
+        pkgs_install(localrepo, repos, namespace.packages)
     elif namespace.command == "remove":
-        pkgs_remove(namespace.packages)
+        pkgs_remove(localrepo, namespace.packages)

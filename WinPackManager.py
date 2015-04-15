@@ -39,6 +39,11 @@ class Repo():
             PKGS.append(pkg_name, self.PKGLIST[pkg_name]['version'])
         return PKGS
 
+    def search(self, pkg_name):
+        if pkg_name in self.PKGLIST:
+            return pkg_name, self.PKGLIST[pkg_name]['version']
+        return 0
+
 class LocalRepo(Repo):
     def repo_check(self):
         """Функция проверяет наличие файла индекса"""
@@ -142,13 +147,11 @@ class LocalRepo(Repo):
         """Функция удаляет ранее установленный пакет"""
         if pkg_name in self.PKGLIST:                  # Проверяем есть ли такой
             pkg_version = self.PKGLIST[pkg_name]['version']
+            soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+
+            subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
+            'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+            shutil.rmtree(soft_dir)
+            self.change_index('delete', pkg_name)
         else:
             return 1
-
-        soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
-
-        subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
-            'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
-        shutil.rmtree(soft_dir)
-        self.change_index('delete', pkg_name)
-        return 0
