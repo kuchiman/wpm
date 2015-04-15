@@ -2,8 +2,7 @@ import os
 import sys
 import argparse
 import configparser
-import WinPackManager.Repo as Repo
-import WinPackManager.LocalRepo as LocalRepo
+from WinPackManager import Repo, LocalRepo
 
 
 def read_config():
