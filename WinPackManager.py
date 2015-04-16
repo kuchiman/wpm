@@ -16,6 +16,7 @@ class Repo():
         self.NAME = name
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         if self.repo_check() == 0:
+            self.PKGLIST = configparser.ConfigParser()
             self.PKGLIST.read(self.INDEX)
 
     def __repr__(self):
