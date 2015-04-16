@@ -29,12 +29,6 @@ def read_config():
         print('Конфигурационный файл повреждён!! Не указан адрес кэша')
         raise SystemExit(1)
 
-    print("Имя репозитория " + localrepo.NAME)
-    print("Адрес репозитория " + localrepo.REPO_DIR)
-    print("Индекс репозитория " + localrepo.INDEX)
-    print("Доступные пакеты")
-    print(localrepo.list())
-
     return localrepo, repos
 
 
@@ -48,6 +42,7 @@ def show_config(repo):
 
 
 def pkgs_list(repos):
+    print("-" * 80)
     print("\tДоступны следующие пакеты.")
     print("-" * 80)
     for repo in repos:
@@ -60,6 +55,7 @@ def pkgs_list(repos):
 
 
 def pkgs_list_installed(localrepo):
+    print("-" * 80)
     print("\tУстановлены следующие пакеты.")
     print("-" * 80)
     print(localrepo.NAME)
@@ -71,6 +67,7 @@ def pkgs_list_installed(localrepo):
 
 
 def pkgs_list_updated(localrepo, repos):
+    print("-" * 80)
     print("\tДоступны следующие обновления.")
     print("-" * 80)
     for repo in repos:

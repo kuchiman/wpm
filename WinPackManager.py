@@ -5,13 +5,8 @@ import configparser
 
 
 class Repo():
-    #NAME = ''
-    #REPO_DIR = ''
-    #INDEX = ''
-    #PKGLIST = configparser.ConfigParser()
 
     def __init__(self, name, repo_dir):
-        #super(Repo, self).__init__()
         self.REPO_DIR = repo_dir
         self.NAME = name
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
