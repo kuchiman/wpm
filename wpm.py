@@ -84,6 +84,8 @@ def pkgs_remove(localrepo, pkgs):
         if localrepo.pkg_remove(pkg):
             print("Пакет " + pkg + " не найден!!")
 
+    localrepo.write_index()
+
 
 def pkgs_install(localrepo, repos, pkgs):
     for pkg in pkgs:
@@ -102,6 +104,8 @@ def pkgs_install(localrepo, repos, pkgs):
         else:
             print("Пакет " + pkg + "устанавливается")
             localrepo.pkg_install(pkg, pkg_in[0])
+
+    localrepo.write_index()
 
 
 def createParser():
