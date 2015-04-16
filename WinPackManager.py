@@ -5,10 +5,10 @@ import configparser
 
 
 class Repo():
-    NAME = ''
-    REPO_DIR = ''
-    INDEX = ''
-    PKGLIST = configparser.ConfigParser()
+    #NAME = ''
+    #REPO_DIR = ''
+    #INDEX = ''
+    #PKGLIST = configparser.ConfigParser()
 
     def __init__(self, name, repo_dir):
         #super(Repo, self).__init__()
