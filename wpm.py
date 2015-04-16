@@ -100,9 +100,9 @@ def pkgs_install(localrepo, repos, pkgs):
             for i in pkg_in:
                 print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg)[1])
         elif len(pkg_in) == 0:
-            print("Пакет " + pkg + "не найден")
+            print("Пакет " + pkg + " не найден")
         else:
-            print("Пакет " + pkg + "устанавливается")
+            print("Пакет " + pkg + " устанавливается")
             localrepo.pkg_install(pkg, pkg_in[0])
 
     localrepo.write_index()

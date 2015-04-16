@@ -5,10 +5,13 @@ import configparser
 
 
 class Repo():
-
+    """Класс описывает репозиторий и его основные методы
+    (общие для всех репозиториев)"""
     def __init__(self, name, repo_dir):
-        self.REPO_DIR = repo_dir
+        """Конструктор заполняет свойства класса. Как видно из кода имя файла
+        индекса захардкожено"""
         self.NAME = name
+        self.REPO_DIR = repo_dir
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         if self.repo_check() == 0:
             self.PKGLIST = configparser.ConfigParser()
@@ -37,12 +40,16 @@ class Repo():
         return PKGS
 
     def search(self, pkg_name):
+        """Функция ищет пакет в репозитории, если находит возвращает имя
+        и версию"""
         if pkg_name in self.PKGLIST:
             return pkg_name, self.PKGLIST[pkg_name]['version']
         return 0
 
 
 class LocalRepo(Repo):
+    """Частный вид репозитория, отличается от остальных тем что может
+    изменяться из программы"""
     def repo_check(self):
         """Функция проверяет наличие файла индекса"""
         if not os.path.isdir(self.REPO_DIR):
@@ -56,24 +63,23 @@ class LocalRepo(Repo):
     def list_updated(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
         PKGUP = []
-
         for pkg_name, pkg_version in repo.list():
             if pkg_name in self.PKGLIST:
                 cachepkg_version = self.PKGLIST[pkg_name]['version']
                 if cachepkg_version < pkg_version:
-                    PKGUP.append(pkg_name, cachepkg_version,
-                        pkg_version)
+                    PKGUP.append(pkg_name, cachepkg_version, pkg_version)
         return PKGUP
 
     def write_index(self):
-        """Запись локального файла индекса"""
+        """Запись содержимого локальной переменной в файл индекса"""
         with open(self.INDEX, 'w') as indexfile:
             self.PKGLIST.write(indexfile)
 
     def change_index(self, action, pkg_name, repo=None):
         """Функция добавляет или удаляет запись о пакете в системной
         переменной(не в файле индекса) Первый аргумент это необходимое действие
-        а второй запись о пакете вида ("имя", "версия")"""
+        а второй имя пакета. Экземпляр класса Repo является необязательным для
+        части операций"""
 
         if action == 'delete':               # Удаление записи о пакете
             del self.PKGLIST[pkg_name]
@@ -143,7 +149,7 @@ class LocalRepo(Repo):
 
     def pkg_remove(self, pkg_name):
         """Функция удаляет ранее установленный пакет"""
-        if pkg_name in self.PKGLIST:                  # Проверяем есть ли такой
+        if pkg_name in self.PKGLIST:             # Проверяем есть ли такой
             pkg_version = self.PKGLIST[pkg_name]['version']
             soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
