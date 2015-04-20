@@ -1,3 +1,4 @@
+"""Версия 0.1"""
 import os
 import sys
 import argparse
