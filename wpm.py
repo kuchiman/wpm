@@ -10,12 +10,13 @@ def read_config():
     """Функция читает конфиг и инициализирует переменные"""
     repos = []
 
-    if not os.path.isfile('config.ini'):
+    CONF = os.path.join('', os.path.dirname(sys.argv[0]) , 'config.ini')
+    if not os.path.isfile(CONF):
         print('Отсутствует конфигурационный файл!!')
         raise SystemExit(1)
 
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config.read(CONF)
 
     if 'REPOSITORY' in config:
         for name in config['REPOSITORY']:
