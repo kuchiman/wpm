@@ -4,13 +4,13 @@ import sys
 import argparse
 import configparser
 from WinPackManager import Repo, LocalRepo
-
+#  dependence branch
 
 def read_config():
     """Функция читает конфиг и инициализирует переменные"""
     repos = []
 
-    CONF = os.path.join('', os.path.dirname(sys.argv[0]) , 'config.ini')
+    CONF = os.path.join('', os.path.dirname(sys.argv[0]), 'config.ini')
     if not os.path.isfile(CONF):
         print('Отсутствует конфигурационный файл!!')
         raise SystemExit(1)
