@@ -47,6 +47,13 @@ class Repo():
             return pkg_name, self.PKGLIST[pkg_name]['version']
         return 0
 
+    def list_dependences(self, pkg_name):
+        if 'dependences' in self.PKGLIST[pkg_name]:
+            d = self.PKGLIST[pkg_name]['dependences']
+            return d.replace(' ', '').split(",")
+        else:
+            return []
+
 
 class LocalRepo(Repo):
     """Частный вид репозитория, отличается от остальных тем что может
@@ -87,10 +94,16 @@ class LocalRepo(Repo):
         elif action == 'write':              # Добавление записи о пакете
             self.PKGLIST[pkg_name] = {}
             self.PKGLIST[pkg_name]['version'] = repo.PKGLIST[pkg_name]['version']
-            self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
+            if 'file' in repo.PKGLIST[pkg_name]:
+                self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
+            if 'dependences' in repo.PKGLIST[pkg_name]:
+                self.PKGLIST[pkg_name]['dependences'] = repo.PKGLIST[pkg_name]['dependences']
         elif action == 'update':             # Обновление записи о пакете
             self.PKGLIST[pkg_name]['version'] = repo.PKGLIST[pkg_name]['version']
-            self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
+            if 'file' in repo.PKGLIST[pkg_name]:
+                self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
+            if 'dependences' in repo.PKGLIST[pkg_name]:
+                self.PKGLIST[pkg_name]['dependences'] = repo.PKGLIST[pkg_name]['dependences']
 
     def pkg_download(self, pkg_name, repo):
         """Функция загружает пакет из репозитория в кэш"""
@@ -229,6 +242,18 @@ class WPM():
                 print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
             print("-" * 80)
 
+    def check_pkg(self, pkg):
+        pkg_in = []
+        for r in self.repos:
+            if r.search(pkg):
+                pkg_in.append(r)
+        return pkg_in
+
+    def list_dependences(self, pkgs):
+        for r in self.repos:
+            if r.search(pkg):
+
+
     def remove(self, pkgs):
         for pkg in pkgs:
             if self.localrepo.pkg_remove(pkg):
@@ -238,20 +263,16 @@ class WPM():
 
     def install(self, pkgs):
         for pkg in pkgs:
-            pkg_in = []
+            check = check_pkg(pkg)
 
-            for r in self.repos:
-                if r.search(pkg):
-                    pkg_in.append(r)
-
-            if len(pkg_in) > 1:
+            if len(check) > 1:
                 print("Пакет писутствует в нескольких репозиториях!!")
-                for i in pkg_in:
+                for i in check:
                     print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg)[1])
-            elif len(pkg_in) == 0:
+            elif check:
                 print("Пакет " + pkg + " не найден")
             else:
                 print("Пакет " + pkg + " устанавливается")
-                self.localrepo.pkg_install(pkg, pkg_in[0])
+                self.localrepo.pkg_install(pkg, check[0])
 
         self.localrepo.write_index()
