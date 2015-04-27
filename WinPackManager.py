@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import subprocess
 import configparser
@@ -159,3 +160,98 @@ class LocalRepo(Repo):
             self.change_index('delete', pkg_name)
         else:
             return 1
+
+
+class WPM():
+
+    def __init__(self):
+        self.localrepo, self.repos = self.read_config()
+
+    def read_config(self):
+        """Функция читает конфиг и инициализирует переменные"""
+        repos = []
+
+        CONF = os.path.join('', os.path.dirname(sys.argv[0]), 'config.ini')
+        if not os.path.isfile(CONF):
+            print('Отсутствует конфигурационный файл!!')
+            raise SystemExit(1)
+
+        config = configparser.ConfigParser()
+        config.read(CONF)
+
+        if 'REPOSITORY' in config:
+            for name in config['REPOSITORY']:
+                repos.append(Repo(name, config['REPOSITORY'][name]))
+        else:
+            print('Не указан адрес репозитория!!')
+            raise SystemExit(1)
+
+        if 'CACHE' in config and 'dir' in config['CACHE']:
+            localrepo = LocalRepo('local', config['CACHE']['dir'])
+        else:
+            print('Конфигурационный файл повреждён!! Не указан адрес кэша')
+            raise SystemExit(1)
+
+        return localrepo, repos
+
+    def list(self):
+        print("-" * 80)
+        print("\tДоступны следующие пакеты.")
+        print("-" * 80)
+        for repo in self.repos:
+            print(repo.NAME)
+            print("-" * 80)
+            print("\tПакет\t\t\tДоступная версия")
+            for pkg in repo.list():
+                print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+            print("-" * 80)
+
+    def list_installed(self):
+        print("-" * 80)
+        print("\tУстановлены следующие пакеты.")
+        print("-" * 80)
+        print(self.localrepo.NAME)
+        print("-" * 80)
+        print("\tПакет\t\t\tТекущая версия")
+        for pkg in self.localrepo.list():
+            print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+        print("-" * 80)
+
+    def list_update(self):
+        print("-" * 80)
+        print("\tДоступны следующие обновления.")
+        print("-" * 80)
+        for repo in self.repos:
+            print(repo.NAME)
+            print("-" * 80)
+            print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
+            for pkg in self.localrepo.list_updated(repo):
+                print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
+            print("-" * 80)
+
+    def remove(self, pkgs):
+        for pkg in pkgs:
+            if self.localrepo.pkg_remove(pkg):
+                print("Пакет " + pkg + " не найден!!")
+
+        self.localrepo.write_index()
+
+    def install(self, pkgs):
+        for pkg in pkgs:
+            pkg_in = []
+
+            for r in self.repos:
+                if r.search(pkg):
+                    pkg_in.append(r)
+
+            if len(pkg_in) > 1:
+                print("Пакет писутствует в нескольких репозиториях!!")
+                for i in pkg_in:
+                    print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg)[1])
+            elif len(pkg_in) == 0:
+                print("Пакет " + pkg + " не найден")
+            else:
+                print("Пакет " + pkg + " устанавливается")
+                self.localrepo.pkg_install(pkg, pkg_in[0])
+
+        self.localrepo.write_index()
