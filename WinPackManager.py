@@ -243,18 +243,48 @@ class WPM():
             print("-" * 80)
 
     def check_pkg(self, pkg):
+        """Функция проверяет есть ли пакет с таким именем и если есть то в
+        скольких репозиториях. На данный момент наличие пакета в нескольких
+        репозиториях рассматривается как ошибка"""
         pkg_in = []
         for r in self.repos:
             if r.search(pkg):
                 pkg_in.append(r)
         return pkg_in
 
-    def list_dependences(self, pkgs):
-        for r in self.repos:
-            if r.search(pkg):
+    #def list_dependences(self, pkgs):
+        #for pkg in pkgs:
+            #for r in self.repos:
+                #if r.search(pkg):
 
+    def resolv_level_dependences(self, pkgs):
+        """Если разложить зависимости в виде дерева вниз, то эта функция
+        позволяет определить зависимости пакетов на один уровень вниз. Поиск
+        ведётся рекурсивно"""
+        if len(pkgs) > 0:
+            pkg = pkgs[0]
+            pkgs.pop(0)
+            check = self.check_pkg(pkg)
+            if len(check) == 1:
+                return check[0].listdependences(pkg).extend(self.resolv_level_dependences(pkgs))
+            else:
+                return [].extend(self.resolv_level_dependences(pkgs))
+        else:
+            return []
+
+    def resolv_dependences(self, pkgs):
+        """Функция использяю предыдущую функцию поиска зависимостей на уровне,
+        проходит вниз по дереву зависимостей, до тех пор пока все зависимости
+        не будут найдены"""
+        result = []
+        result.append(pkgs)
+        result.append(self.resolv_level_dependences(result[len(result) - 1]))
+        while len(result[len(result) - 1]) > 0:
+            result.append(self.resolv_level_dependences(result[len(result) - 1]))
+        return list(set([d for i in result for d in i]))
 
     def remove(self, pkgs):
+        """Функция удаляет пакеты переданные в кажестве аргумента"""
         for pkg in pkgs:
             if self.localrepo.pkg_remove(pkg):
                 print("Пакет " + pkg + " не найден!!")
@@ -262,8 +292,9 @@ class WPM():
         self.localrepo.write_index()
 
     def install(self, pkgs):
+        """Функция устанавливает пакеты переданные в качестве списка"""
         for pkg in pkgs:
-            check = check_pkg(pkg)
+            check = self.check_pkg(pkg)
 
             if len(check) > 1:
                 print("Пакет писутствует в нескольких репозиториях!!")
