@@ -29,16 +29,18 @@ class Repo():
             for name in self.PKGLIST.sections()]
 
     def search(self, pkg_name):
-        """Функция ищет пакет в репозитории, если находит возвращает имя
-        и версию"""
-        if pkg_name in self.PKGLIST:
+        """Функция ищет пакет в репозитории, если находит возвращает версию"""
+        try:
             return self.PKGLIST[pkg_name]['version']
-        return None
+        except KeyError:
+            return None
 
     def list_dependences(self, pkg_name):
-        if 'dependences' in self.PKGLIST[pkg_name]:
+        """Функция возвращает список зависимостей если они есть"""
+        try:
             return self.PKGLIST[pkg_name]['dependences'].replace(' ', '').split(",")
-        return []
+        except KeyError:
+            return []
 
 
 class LocalRepo(Repo):
@@ -79,22 +81,24 @@ class LocalRepo(Repo):
         а второй имя пакета. Экземпляр класса Repo является необязательным для
         части операций"""
         PKG = repo.PKGLIST[pkg_name]
+        CACH_PKG = self.PKGLIST[pkg_name]
 
         if action == 'delete':               # Удаление записи о пакете
-            del self.PKGLIST[pkg_name]
-        elif action == 'write':              # Добавление записи о пакете
-            self.PKGLIST[pkg_name] = {}
+            del CACH_PKG
+        else:                     # Добавление записи о пакете или обновление
+            if action == 'write':
+                CACH_PKG = {}
             self.PKGLIST[pkg_name]['version'] = PKG['version']
+
             if 'file' in PKG:
-                self.PKGLIST[pkg_name]['file'] = PKG['file']
+                CACH_PKG['file'] = PKG['file']
+            elif action == 'update' and 'file' in CACH_PKG:
+                del CACH_PKG['file']
+
             if 'dependences' in PKG:
-                self.PKGLIST[pkg_name]['dependences'] = PKG['dependences']
-        elif action == 'update':             # Обновление записи о пакете
-            self.PKGLIST[pkg_name]['version'] = PKG['version']
-            if 'file' in PKG:
-                self.PKGLIST[pkg_name]['file'] = PKG['file']
-            if 'dependences' in PKG:
-                self.PKGLIST[pkg_name]['dependences'] = PKG['dependences']
+                CACH_PKG['dependences'] = PKG['dependences']
+            elif action == 'update' and 'dependences' in CACH_PKG:
+                del CACH_PKG['dependences']
 
     def pkg_download(self, pkg_name, repo):
         """Функция загружает пакет из репозитория в кэш"""
@@ -194,18 +198,18 @@ class WPM():
             for name in config['REPOSITORY']:
                 try:
                     repos.append(Repo(name, config['REPOSITORY'][name]))
-                except NameError as e:
+                except KeyError as e:
                     print("Отсутствует индекс репозитория " + self.NAME)
                     print(e)
                     sys.exit()
-        except NameError as e:
+        except KeyError as e:
             print('Не указан адрес репозитория!!')
             print(e)
             sys.exit()
 
         try:
             localrepo = LocalRepo('local', config['CACHE']['dir'])
-        except NameError as e:
+        except KeyError as e:
             print("Конфигурационный файл повреждён!! Не указан адрес кэша")
             print(e)
             sys.exit()
