@@ -61,7 +61,7 @@ class LocalRepo(Repo):
             open(self.INDEX, 'w+').close()  # Создан пустой индекс
             self.PKGLIST.read(self.INDEX)
 
-    def list_updated(self, repo):
+    def list_update(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
         return [[name, self.PKGLIST[name]['version'], version]
             for name, version in repo.list()
@@ -135,7 +135,6 @@ class LocalRepo(Repo):
                 return 3  # Обновлён
             return 2  # Уже установлен
         else:
-            print("Пакет будет установлен")
             self.pkg_download(pkg_name, repo)
             p = subprocess.call(['python',
                 os.path.join('', soft_dir, 'script.py'), 'install'],
@@ -191,7 +190,7 @@ class WPM():
             print(e)
             sys.exit()
 
-        if 'REPOSITORY' in config:
+        try:
             for name in config['REPOSITORY']:
                 try:
                     repos.append(Repo(name, config['REPOSITORY'][name]))
@@ -199,14 +198,16 @@ class WPM():
                     print("Отсутствует индекс репозитория " + self.NAME)
                     print(e)
                     sys.exit()
-        else:
+        except NameError as e:
             print('Не указан адрес репозитория!!')
+            print(e)
             sys.exit()
 
-        if 'CACHE' in config and 'dir' in config['CACHE']:
+        try:
             localrepo = LocalRepo('local', config['CACHE']['dir'])
-        else:
-            print('Конфигурационный файл повреждён!! Не указан адрес кэша')
+        except NameError as e:
+            print("Конфигурационный файл повреждён!! Не указан адрес кэша")
+            print(e)
             sys.exit()
 
         return localrepo, repos
@@ -242,7 +243,7 @@ class WPM():
             print(repo.NAME)
             print("-" * 80)
             print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
-            for pkg in self.localrepo.list_updated(repo):
+            for pkg in self.localrepo.list_update(repo):
                 print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
             print("-" * 80)
 
