@@ -14,24 +14,14 @@ class Repo():
         self.NAME = name
         self.REPO_DIR = repo_dir
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
-        if self.repo_check() == 0:
-            self.PKGLIST = configparser.ConfigParser()
-            self.PKGLIST.read(self.INDEX)
+        self.PKGLIST = configparser.ConfigParser()
+        self.PKGLIST.read(self.INDEX)
 
     def __repr__(self):
         return self.NAME
 
     def __str__(self):
         return self.NAME
-
-    def repo_check(self):
-        """Функция проверяет доступность директории с пакетами"""
-        if not os.path.isdir(self.REPO_DIR):  # Репозиторий не доступен
-            return 1
-        elif not os.path.isfile(self.INDEX):  # Отсутствует индекс
-            return 2
-        else:                                 # Репозиторий доступен
-            return 0
 
     def list(self):
         """Функция возвращает список доступных в репозитории пакетов"""
@@ -58,15 +48,22 @@ class Repo():
 class LocalRepo(Repo):
     """Частный вид репозитория, отличается от остальных тем что может
     изменяться из программы"""
-    def repo_check(self):
-        """Функция проверяет наличие файла индекса"""
-        if not os.path.isdir(self.REPO_DIR):
-            os.makedirs(self.REPO_DIR)           # Создана директория
-            open(self.INDEX, 'w+').close()   # Создан пустой индекс
-        else:
-            if not os.path.isfile(self.INDEX):
-                open(self.INDEX, 'w+').close()
-        return 0
+    def __init__(self, name, repo_dir):
+        """Конструктор заполняет свойства класса. Как видно из кода имя файла
+        индекса захардкожено"""
+        self.NAME = name
+        self.REPO_DIR = repo_dir
+        self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
+        self.PKGLIST = configparser.ConfigParser()
+        try:
+            self.PKGLIST.read(self.INDEX)
+        except NameError:
+            try:
+                os.makedirs(self.REPO_DIR)  # Создана директория
+            except os.FileExistsError:
+                pass
+            open(self.INDEX, 'w+').close()  # Создан пустой индекс
+            self.PKGLIST.read(self.INDEX)
 
     def list_updated(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
@@ -175,6 +172,23 @@ class LocalRepo(Repo):
             return 1
 
 
+class WpmErr(Exception):
+    pass
+
+
+class PackNameErr(WpmErr):
+
+    def __init__(self, pkg_name):
+        self.pkg_name = pkg_name
+
+
+class MultiRepoCollision(WpmErr):
+
+    def __init__(self, pkg_name, repos):
+        self.pkg_name = pkg_name
+        self.repos = repos
+
+
 class WPM():
 
     def __init__(self):
@@ -185,25 +199,31 @@ class WPM():
         repos = []
 
         CONF = os.path.join('', os.path.dirname(sys.argv[0]), 'config.ini')
-        if not os.path.isfile(CONF):
-            print('Отсутствует конфигурационный файл!!')
-            raise SystemExit(1)
-
         config = configparser.ConfigParser()
-        config.read(CONF)
+        try:
+            config.read(CONF)
+        except NameError as e:
+            print("Отсутствует конфигурационный файл!!")
+            print(e)
+            sys.exit()
 
         if 'REPOSITORY' in config:
             for name in config['REPOSITORY']:
-                repos.append(Repo(name, config['REPOSITORY'][name]))
+                try:
+                    repos.append(Repo(name, config['REPOSITORY'][name]))
+                except NameError as e:
+                    print("Отсутствует индекс репозитория " + self.NAME)
+                    print(e)
+                    sys.exit()
         else:
             print('Не указан адрес репозитория!!')
-            raise SystemExit(1)
+            sys.exit()
 
         if 'CACHE' in config and 'dir' in config['CACHE']:
             localrepo = LocalRepo('local', config['CACHE']['dir'])
         else:
             print('Конфигурационный файл повреждён!! Не указан адрес кэша')
-            raise SystemExit(1)
+            sys.exit()
 
         return localrepo, repos
 
@@ -250,6 +270,10 @@ class WPM():
         for r in self.repos:
             if r.search(pkg):
                 pkg_in.append(r)
+        if len(pkg_in) == 0:
+            raise PackNameErr(pkg)
+        elif len(pkg_in) > 1:
+            raise MultiRepoCollision(pkg, pkg_in)
         return pkg_in
 
     #def list_dependences(self, pkgs):
