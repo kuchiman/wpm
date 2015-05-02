@@ -263,7 +263,7 @@ class WPM():
             raise PackNameErr(pkg)
         elif len(pkg_in) > 1:
             raise MultiRepoCollision(pkg, pkg_in)
-        return pkg_in
+        return pkg_in[0]
 
     #def list_dependences(self, pkgs):
         #for pkg in pkgs:
@@ -277,11 +277,17 @@ class WPM():
         if len(pkgs) > 0:
             pkg = pkgs[0]
             pkgs.pop(0)
-            check = self.check_pkg(pkg)
-            if len(check) == 1:
-                return check[0].listdependences(pkg).extend(self.resolv_level_dependences(pkgs))
-            else:
-                return [].extend(self.resolv_level_dependences(pkgs))
+            try:
+                repo = self.check_pkg(pkg)
+                return repo.list_dependences(pkg).extend(self.resolv_level_dependences(pkgs))
+            except PackNameErr as e:
+                print("Пакет с таким именем не существует ")
+                print(e)
+                sys.exit()
+            except MultiRepoCollision as e:
+                print("Пакет с таким именем присутствует сразу в несколький репозиториях")
+                print(e)
+                sys.exit()
         else:
             return []
 
@@ -306,17 +312,10 @@ class WPM():
 
     def install(self, pkgs):
         """Функция устанавливает пакеты переданные в качестве списка"""
-        for pkg in pkgs:
-            check = self.check_pkg(pkg)
-
-            if len(check) > 1:
-                print("Пакет писутствует в нескольких репозиториях!!")
-                for i in check:
-                    print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg))
-            elif check:
-                print("Пакет " + pkg + " не найден")
-            else:
-                print("Пакет " + pkg + " устанавливается")
-                self.localrepo.pkg_install(pkg, check[0])
+        dep = self.resolv_dependences(pkgs)
+        for pkg in dep:
+            repo = self.check_pkg(pkg)
+            print("Пакет " + pkg + " устанавливается")
+            self.localrepo.pkg_install(pkg, repo)
 
         self.localrepo.write_index()
