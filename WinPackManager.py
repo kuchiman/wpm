@@ -32,8 +32,8 @@ class Repo():
         """Функция ищет пакет в репозитории, если находит возвращает имя
         и версию"""
         if pkg_name in self.PKGLIST:
-            return pkg_name, self.PKGLIST[pkg_name]['version']
-        return 0
+            return self.PKGLIST[pkg_name]['version']
+        return None
 
     def list_dependences(self, pkg_name):
         if 'dependences' in self.PKGLIST[pkg_name]:
@@ -78,22 +78,23 @@ class LocalRepo(Repo):
         переменной(не в файле индекса) Первый аргумент это необходимое действие
         а второй имя пакета. Экземпляр класса Repo является необязательным для
         части операций"""
+        PKG = repo.PKGLIST[pkg_name]
 
         if action == 'delete':               # Удаление записи о пакете
             del self.PKGLIST[pkg_name]
         elif action == 'write':              # Добавление записи о пакете
             self.PKGLIST[pkg_name] = {}
-            self.PKGLIST[pkg_name]['version'] = repo.PKGLIST[pkg_name]['version']
-            if 'file' in repo.PKGLIST[pkg_name]:
-                self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
-            if 'dependences' in repo.PKGLIST[pkg_name]:
-                self.PKGLIST[pkg_name]['dependences'] = repo.PKGLIST[pkg_name]['dependences']
+            self.PKGLIST[pkg_name]['version'] = PKG['version']
+            if 'file' in PKG:
+                self.PKGLIST[pkg_name]['file'] = PKG['file']
+            if 'dependences' in PKG:
+                self.PKGLIST[pkg_name]['dependences'] = PKG['dependences']
         elif action == 'update':             # Обновление записи о пакете
-            self.PKGLIST[pkg_name]['version'] = repo.PKGLIST[pkg_name]['version']
-            if 'file' in repo.PKGLIST[pkg_name]:
-                self.PKGLIST[pkg_name]['file'] = repo.PKGLIST[pkg_name]['file']
-            if 'dependences' in repo.PKGLIST[pkg_name]:
-                self.PKGLIST[pkg_name]['dependences'] = repo.PKGLIST[pkg_name]['dependences']
+            self.PKGLIST[pkg_name]['version'] = PKG['version']
+            if 'file' in PKG:
+                self.PKGLIST[pkg_name]['file'] = PKG['file']
+            if 'dependences' in PKG:
+                self.PKGLIST[pkg_name]['dependences'] = PKG['dependences']
 
     def pkg_download(self, pkg_name, repo):
         """Функция загружает пакет из репозитория в кэш"""
@@ -103,15 +104,13 @@ class LocalRepo(Repo):
         name_dir = os.path.join('', self.REPO_DIR, pkg_name)
         dst = os.path.join('', name_dir, pkg_version)
 
-        if not os.path.isdir(name_dir):
-            # Если директория для пакета не существует
+        try:
             os.makedirs(name_dir)
+        except os.FileExistsError:
+            pass
+        try:
             os.makedirs(dst)
-        elif os.path.isdir(name_dir) and not os.path.isdir(dst):
-            # Если директория существует но нет директории с номером версии
-            print(os.path.isdir(name_dir) and not os.path.isdir(dst))
-            os.makedirs(dst)
-        else:  # Если путь существует значит там что то лежит, удалить всё
+        except os.FileExistsError:
             shutil.rmtree(dst)
             os.makedirs(dst)
 
@@ -119,29 +118,22 @@ class LocalRepo(Repo):
 
     def pkg_install(self, pkg_name, repo):
         """Функция устанавливает пакет с указанным именем."""
-        if pkg_name in self.PKGLIST:
-            cachepkg_version = self.PKGLIST[pkg_name]['version']
-        else:
-            cachepkg_version = '0'
-
-        if pkg_name in repo.PKGLIST:   # Проверяем есть ли такой в репах
-            pkg_version = repo.PKGLIST[pkg_name]['version']
-        else:
+        pkg_version = repo.search(pkg_name)
+        if not pkg_version:
             return 1
 
         soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
-        # Проверка не установлен ли уже пакет
-        if pkg_name in self.PKGLIST:
-            if cachepkg_version == pkg_version:
-                return 2  # Уже установлен
-            elif cachepkg_version < pkg_version:
+        cachepkg_version = self.search(pkg_name)
+        if cachepkg_version:  # Если пакет уже установлен
+            if cachepkg_version < pkg_version:
                 self.pkg_download(pkg_name, repo)
                 p = subprocess.call(['python',
                     os.path.join('', soft_dir, 'script.py'), 'install'],
                     shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
                 self.change_index('update', pkg_name, repo)
                 return 3  # Обновлён
+            return 2  # Уже установлен
         else:
             print("Пакет будет установлен")
             self.pkg_download(pkg_name, repo)
@@ -153,10 +145,9 @@ class LocalRepo(Repo):
 
     def pkg_remove(self, pkg_name):
         """Функция удаляет ранее установленный пакет"""
-        if pkg_name in self.PKGLIST:             # Проверяем есть ли такой
-            pkg_version = self.PKGLIST[pkg_name]['version']
+        pkg_version = self.search(pkg_name)
+        if pkg_version:     # Проверяем есть ли такой
             soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
-
             subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
             'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
             shutil.rmtree(soft_dir)
@@ -316,7 +307,7 @@ class WPM():
             if len(check) > 1:
                 print("Пакет писутствует в нескольких репозиториях!!")
                 for i in check:
-                    print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg)[1])
+                    print(i.NAME + "\t\t" + pkg + "\t\t" + i.search(pkg))
             elif check:
                 print("Пакет " + pkg + " не найден")
             else:
