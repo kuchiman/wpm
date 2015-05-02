@@ -27,9 +27,6 @@ class Repo():
         """Функция возвращает список доступных в репозитории пакетов"""
         return [[name, self.PKGLIST[name]['version']]
             for name in self.PKGLIST.sections()]
-        #for pkg_name in self.PKGLIST.sections():
-        #    PKGS.append((pkg_name, self.PKGLIST[pkg_name]['version']))
-        #return PKGS
 
     def search(self, pkg_name):
         """Функция ищет пакет в репозитории, если находит возвращает имя
@@ -40,8 +37,6 @@ class Repo():
 
     def list_dependences(self, pkg_name):
         if 'dependences' in self.PKGLIST[pkg_name]:
-            #d = self.PKGLIST[pkg_name]['dependences']
-            #return d.replace(' ', '').split(",")
             return self.PKGLIST[pkg_name]['dependences'].replace(' ', '').split(",")
         return []
 
@@ -72,13 +67,6 @@ class LocalRepo(Repo):
             for name, version in repo.list()
             if name in self.PKGLIST
             if self.PKGLIST[name]['version'] < version]
-        #PKGUP = []
-        #for pkg_name, pkg_version in repo.list():
-            #if pkg_name in self.PKGLIST:
-                #cachepkg_version = self.PKGLIST[pkg_name]['version']
-                #if cachepkg_version < pkg_version:
-                    #PKGUP.append(pkg_name, cachepkg_version, pkg_version)
-        #return PKGUP
 
     def write_index(self):
         """Запись содержимого локальной переменной в файл индекса"""
