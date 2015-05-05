@@ -81,13 +81,15 @@ class LocalRepo(Repo):
         а второй имя пакета. Экземпляр класса Repo является необязательным для
         части операций"""
         PKG = repo.PKGLIST[pkg_name]
-        CACH_PKG = self.PKGLIST[pkg_name]
+
+        try:
+            CACH_PKG = self.PKGLIST[pkg_name]
+        except KeyError:
+            CACH_PKG = {}
 
         if action == 'delete':               # Удаление записи о пакете
             del CACH_PKG
         else:                     # Добавление записи о пакете или обновление
-            if action == 'write':
-                CACH_PKG = {}
             self.PKGLIST[pkg_name]['version'] = PKG['version']
 
             if 'file' in PKG:
