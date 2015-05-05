@@ -291,7 +291,7 @@ class WPM():
                 repo = self.check_pkg(pkg)
                 result.extend(repo.list_dependences(pkg))
             except PackNameErr as e:
-                print("Пакет с именем " + e + " не существует.")
+                print("Пакет с именем " + e.pkg_name + " не существует.")
                 print(e)
                 sys.exit()
             except MultiRepoCollision as e:
