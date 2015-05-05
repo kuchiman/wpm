@@ -5,14 +5,14 @@ import subprocess
 import configparser
 
 
-class RepoCool(configparser.ConfigParser):
+class Repo(configparser.ConfigParser):
     """Класс описывает репозиторий и его основные методы
     (общие для всех репозиториев)"""
 
     def __init__(self, name, repo_dir):
         """Конструктор заполняет свойства класса. Как видно из кода имя файла
         индекса захардкожено"""
-        super(RepoCool, self).__init__()
+        super(Repo, self).__init__()
         self.NAME = name
         self.REPO_DIR = repo_dir
         self.read(os.path.join('', self.REPO_DIR, 'index.ini'))
@@ -36,11 +36,11 @@ class RepoCool(configparser.ConfigParser):
             return []
 
 
-class LocalRepoCool(RepoCool):
+class LocalRepo(Repo):
     """Частный вид репозитория, отличается от остальных тем что может
     изменяться из программы"""
     def __init__(self, name, repo_dir):
-        super(LocalRepoCool, self).__init__(name, repo_dir )
+        super(LocalRepo, self).__init__(name, repo_dir )
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         try:
             self.read(self.INDEX)
@@ -158,168 +158,168 @@ class LocalRepoCool(RepoCool):
         else:
             return 1
 
-class Repo():
-    """Класс описывает репозиторий и его основные методы
-    (общие для всех репозиториев)"""
-    def __init__(self, name, repo_dir):
-        """Конструктор заполняет свойства класса. Как видно из кода имя файла
-        индекса захардкожено"""
-        self.NAME = name
-        self.REPO_DIR = repo_dir
-        self.PKGLIST = configparser.ConfigParser()
-        self.PKGLIST.read(os.path.join('', self.REPO_DIR, 'index.ini'))
+#class Repo():
+    #"""Класс описывает репозиторий и его основные методы
+    #(общие для всех репозиториев)"""
+    #def __init__(self, name, repo_dir):
+        #"""Конструктор заполняет свойства класса. Как видно из кода имя файла
+        #индекса захардкожено"""
+        #self.NAME = name
+        #self.REPO_DIR = repo_dir
+        #self.PKGLIST = configparser.ConfigParser()
+        #self.PKGLIST.read(os.path.join('', self.REPO_DIR, 'index.ini'))
 
-    def __repr__(self):
-        return self.NAME
+    #def __repr__(self):
+        #return self.NAME
 
-    def __str__(self):
-        return self.NAME
+    #def __str__(self):
+        #return self.NAME
 
-    def list(self):
-        """Функция возвращает список доступных в репозитории пакетов"""
-        return [[name, self.PKGLIST[name]['version']]
-            for name in self.PKGLIST.sections()]
+    #def list(self):
+        #"""Функция возвращает список доступных в репозитории пакетов"""
+        #return [[name, self.PKGLIST[name]['version']]
+            #for name in self.PKGLIST.sections()]
 
-    def search(self, pkg_name):
-        """Функция ищет пакет в репозитории, если находит возвращает версию"""
-        try:
-            return self.PKGLIST[pkg_name]['version']
-        except KeyError:
-            return None
+    #def search(self, pkg_name):
+        #"""Функция ищет пакет в репозитории, если находит возвращает версию"""
+        #try:
+            #return self.PKGLIST[pkg_name]['version']
+        #except KeyError:
+            #return None
 
-    def list_dependences(self, pkg_name):
-        """Функция возвращает список зависимостей если они есть"""
-        try:
-            return self.PKGLIST[pkg_name]['dependences'].replace(' ', '').split(",")
-        except KeyError:
-            return []
+    #def list_dependences(self, pkg_name):
+        #"""Функция возвращает список зависимостей если они есть"""
+        #try:
+            #return self.PKGLIST[pkg_name]['dependences'].replace(' ', '').split(",")
+        #except KeyError:
+            #return []
 
 
-class LocalRepo(Repo):
-    """Частный вид репозитория, отличается от остальных тем что может
-    изменяться из программы"""
-    def __init__(self, name, repo_dir):
-        """Конструктор заполняет свойства класса. Как видно из кода имя файла
-        индекса захардкожено"""
-        self.NAME = name
-        self.REPO_DIR = repo_dir
-        self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
-        self.PKGLIST = configparser.ConfigParser()
-        try:
-            self.PKGLIST.read(self.INDEX)
-        except NameError:
-            try:
-                os.makedirs(self.REPO_DIR)  # Создана директория
-            except FileExistsError:
-                pass
-            open(self.INDEX, 'w+').close()  # Создан пустой индекс
-            self.PKGLIST.read(self.INDEX)
+#class LocalRepo(Repo):
+    #"""Частный вид репозитория, отличается от остальных тем что может
+    #изменяться из программы"""
+    #def __init__(self, name, repo_dir):
+        #"""Конструктор заполняет свойства класса. Как видно из кода имя файла
+        #индекса захардкожено"""
+        #self.NAME = name
+        #self.REPO_DIR = repo_dir
+        #self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
+        #self.PKGLIST = configparser.ConfigParser()
+        #try:
+            #self.PKGLIST.read(self.INDEX)
+        #except NameError:
+            #try:
+                #os.makedirs(self.REPO_DIR)  # Создана директория
+            #except FileExistsError:
+                #pass
+            #open(self.INDEX, 'w+').close()  # Создан пустой индекс
+            #self.PKGLIST.read(self.INDEX)
 
-    def list_update(self, repo):
-        """Функция выводит список доступных для обновления пакетов"""
-        return [[name, self.PKGLIST[name]['version'], version]
-            for name, version in repo.list()
-            if name in self.PKGLIST
-            if self.PKGLIST[name]['version'] < version]
+    #def list_update(self, repo):
+        #"""Функция выводит список доступных для обновления пакетов"""
+        #return [[name, self.PKGLIST[name]['version'], version]
+            #for name, version in repo.list()
+            #if name in self.PKGLIST
+            #if self.PKGLIST[name]['version'] < version]
 
-    def write_index(self):
-        """Запись содержимого локальной переменной в файл индекса"""
-        with open(self.INDEX, 'w') as indexfile:
-            self.PKGLIST.write(indexfile)
+    #def write_index(self):
+        #"""Запись содержимого локальной переменной в файл индекса"""
+        #with open(self.INDEX, 'w') as indexfile:
+            #self.PKGLIST.write(indexfile)
 
-    def change_index(self, action, pkg_name, repo=None):
-        """Функция добавляет или удаляет запись о пакете в системной
-        переменной(не в файле индекса) Первый аргумент это необходимое действие
-        а второй имя пакета. Экземпляр класса Repo является необязательным для
-        части операций"""
-        try:
-            CACH_PKG = self.PKGLIST[pkg_name]
-        except KeyError:
-            self.PKGLIST[pkg_name] = {}
-            CACH_PKG = self.PKGLIST[pkg_name]
+    #def change_index(self, action, pkg_name, repo=None):
+        #"""Функция добавляет или удаляет запись о пакете в системной
+        #переменной(не в файле индекса) Первый аргумент это необходимое действие
+        #а второй имя пакета. Экземпляр класса Repo является необязательным для
+        #части операций"""
+        #try:
+            #CACH_PKG = self.PKGLIST[pkg_name]
+        #except KeyError:
+            #self.PKGLIST[pkg_name] = {}
+            #CACH_PKG = self.PKGLIST[pkg_name]
 
-        if action == 'delete':               # Удаление записи о пакете
-            del CACH_PKG
-        else:                     # Добавление записи о пакете или обновление
-            PKG = repo.PKGLIST[pkg_name]
-            CACH_PKG['version'] = PKG['version']
+        #if action == 'delete':               # Удаление записи о пакете
+            #del CACH_PKG
+        #else:                     # Добавление записи о пакете или обновление
+            #PKG = repo.PKGLIST[pkg_name]
+            #CACH_PKG['version'] = PKG['version']
 
-            if 'file' in PKG:
-                CACH_PKG['file'] = PKG['file']
-            elif action == 'update' and 'file' in CACH_PKG:
-                del CACH_PKG['file']
+            #if 'file' in PKG:
+                #CACH_PKG['file'] = PKG['file']
+            #elif action == 'update' and 'file' in CACH_PKG:
+                #del CACH_PKG['file']
 
-            if 'dependences' in PKG:
-                CACH_PKG['dependences'] = PKG['dependences']
-            elif action == 'update' and 'dependences' in CACH_PKG:
-                del CACH_PKG['dependences']
+            #if 'dependences' in PKG:
+                #CACH_PKG['dependences'] = PKG['dependences']
+            #elif action == 'update' and 'dependences' in CACH_PKG:
+                #del CACH_PKG['dependences']
 
-    def pkg_download(self, pkg_name, repo):
-        """Функция загружает пакет из репозитория в кэш"""
-        pkg_version = repo.PKGLIST[pkg_name]['version']
-        pkg_file = repo.PKGLIST[pkg_name]['file']
-        src = os.path.join('', repo.REPO_DIR, pkg_file)
-        name_dir = os.path.join('', self.REPO_DIR, pkg_name)
-        dst = os.path.join('', name_dir, pkg_version)
+    #def pkg_download(self, pkg_name, repo):
+        #"""Функция загружает пакет из репозитория в кэш"""
+        #pkg_version = repo.PKGLIST[pkg_name]['version']
+        #pkg_file = repo.PKGLIST[pkg_name]['file']
+        #src = os.path.join('', repo.REPO_DIR, pkg_file)
+        #name_dir = os.path.join('', self.REPO_DIR, pkg_name)
+        #dst = os.path.join('', name_dir, pkg_version)
 
-        try:
-            os.makedirs(name_dir)
-        except FileExistsError:
-            pass
-        try:
-            os.makedirs(dst)
-        except FileExistsError:
-            shutil.rmtree(dst)
-            os.makedirs(dst)
+        #try:
+            #os.makedirs(name_dir)
+        #except FileExistsError:
+            #pass
+        #try:
+            #os.makedirs(dst)
+        #except FileExistsError:
+            #shutil.rmtree(dst)
+            #os.makedirs(dst)
 
-        shutil.unpack_archive(src, dst, 'zip')
+        #shutil.unpack_archive(src, dst, 'zip')
 
-    def run_script(self, soft_dir, action):
-        """Запуск скрипта с набором ключей"""
-        p = subprocess.call(['python',
-            os.path.join('', soft_dir, 'script.py'), action],
-            shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+    #def run_script(self, soft_dir, action):
+        #"""Запуск скрипта с набором ключей"""
+        #p = subprocess.call(['python',
+            #os.path.join('', soft_dir, 'script.py'), action],
+            #shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
 
-    def pkg_install(self, pkg_name, repo):
-        """Функция устанавливает пакет с указанным именем."""
-        pkg_version = repo.search(pkg_name)
-        if not pkg_version:
-            return 1
+    #def pkg_install(self, pkg_name, repo):
+        #"""Функция устанавливает пакет с указанным именем."""
+        #pkg_version = repo.search(pkg_name)
+        #if not pkg_version:
+            #return 1
 
-        soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+        #soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
-        cachepkg_version = self.search(pkg_name)
-        if cachepkg_version:  # Если пакет уже установлен
-            if cachepkg_version < pkg_version:
-                self.pkg_download(pkg_name, repo)
-                self.run_script(soft_dir, 'install')
-                self.change_index('update', pkg_name, repo)
-                return 3  # Обновлён
-            return 2  # Уже установлен
-        else:
-            if 'file' in repo.PKGLIST[pkg_name]:
-                self.pkg_download(pkg_name, repo)
-                self.run_script(soft_dir, 'install')
-            self.change_index('write', pkg_name, repo)
-            return 4  # Установлен
+        #cachepkg_version = self.search(pkg_name)
+        #if cachepkg_version:  # Если пакет уже установлен
+            #if cachepkg_version < pkg_version:
+                #self.pkg_download(pkg_name, repo)
+                #self.run_script(soft_dir, 'install')
+                #self.change_index('update', pkg_name, repo)
+                #return 3  # Обновлён
+            #return 2  # Уже установлен
+        #else:
+            #if 'file' in repo.PKGLIST[pkg_name]:
+                #self.pkg_download(pkg_name, repo)
+                #self.run_script(soft_dir, 'install')
+            #self.change_index('write', pkg_name, repo)
+            #return 4  # Установлен
 
-    def pkg_remove(self, pkg_name):
-        """Функция удаляет ранее установленный пакет"""
-        pkg_version = self.search(pkg_name)
-        if pkg_version:     # Проверяем есть ли такой
-            soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
-            try:
-                self.run_script(soft_dir, 'remove')
-            except NotADirectoryError:
-                print("Кэшь повреждён!!")
-                sys.exit()
-            except FileNotFoundError:
-                print("Кэшь повреждён!!")
-                sys.exit()
-            shutil.rmtree(soft_dir)
-            self.change_index('delete', pkg_name)
-        else:
-            return 1
+    #def pkg_remove(self, pkg_name):
+        #"""Функция удаляет ранее установленный пакет"""
+        #pkg_version = self.search(pkg_name)
+        #if pkg_version:     # Проверяем есть ли такой
+            #soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+            #try:
+                #self.run_script(soft_dir, 'remove')
+            #except NotADirectoryError:
+                #print("Кэшь повреждён!!")
+                #sys.exit()
+            #except FileNotFoundError:
+                #print("Кэшь повреждён!!")
+                #sys.exit()
+            #shutil.rmtree(soft_dir)
+            #self.change_index('delete', pkg_name)
+        #else:
+            #return 1
 
 
 class WpmErr(Exception):
@@ -360,7 +360,7 @@ class WPM():
         try:
             for name in config['REPOSITORY']:
                 try:
-                    repos.append(RepoCool(name, config['REPOSITORY'][name]))
+                    repos.append(Repo(name, config['REPOSITORY'][name]))
                 except KeyError as e:
                     print("Отсутствует индекс репозитория " + self.NAME)
                     print(e)
@@ -371,7 +371,7 @@ class WPM():
             sys.exit()
 
         try:
-            localrepo = LocalRepoCool('local', config['CACHE']['dir'])
+            localrepo = LocalRepo('local', config['CACHE']['dir'])
         except KeyError as e:
             print("Конфигурационный файл повреждён!! Не указан адрес кэша")
             print(e)
