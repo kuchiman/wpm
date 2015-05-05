@@ -13,9 +13,10 @@ class Repo():
         индекса захардкожено"""
         self.NAME = name
         self.REPO_DIR = repo_dir
-        self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
+        #self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         self.PKGLIST = configparser.ConfigParser()
-        self.PKGLIST.read(self.INDEX)
+        #self.PKGLIST.read(self.INDEX)
+        self.PKGLIST.read(os.path.join('', self.REPO_DIR, 'index.ini'))
 
     def __repr__(self):
         return self.NAME
