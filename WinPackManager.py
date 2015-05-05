@@ -13,7 +13,7 @@ class RepoCool(configparser.ConfigParser):
         """Конструктор заполняет свойства класса. Как видно из кода имя файла
         индекса захардкожено"""
         super(RepoCool, self).__init__()
-        self.REPO_NAME = name
+        self.NAME = name
         self.REPO_DIR = repo_dir
         self.read(os.path.join('', self.REPO_DIR, 'index.ini'))
 
