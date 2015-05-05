@@ -80,8 +80,6 @@ class LocalRepo(Repo):
         переменной(не в файле индекса) Первый аргумент это необходимое действие
         а второй имя пакета. Экземпляр класса Repo является необязательным для
         части операций"""
-        PKG = repo.PKGLIST[pkg_name]
-
         try:
             CACH_PKG = self.PKGLIST[pkg_name]
         except KeyError:
@@ -91,7 +89,8 @@ class LocalRepo(Repo):
         if action == 'delete':               # Удаление записи о пакете
             del CACH_PKG
         else:                     # Добавление записи о пакете или обновление
-            self.PKGLIST[pkg_name]['version'] = PKG['version']
+            PKG = repo.PKGLIST[pkg_name]
+            CACH_PKG['version'] = PKG['version']
 
             if 'file' in PKG:
                 CACH_PKG['file'] = PKG['file']
