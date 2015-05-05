@@ -303,8 +303,10 @@ class WPM():
         #while len(result[len(result) - 1]) > 0:
             #result.append(self.resolv_level_dependences(result[len(result) - 1]))
         dep = self.resolv_level_dependences(pkgs)
+        print(type(dep))
         while len(dep) > 0:
             result.append(dep)
+            print(type(dep))
             dep = self.resolv_level_dependences(dep)
         return list(set([d for i in result for d in i]))
 
