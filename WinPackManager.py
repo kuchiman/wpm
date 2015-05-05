@@ -160,6 +160,10 @@ class LocalRepo(Repo):
                 self.run_script(soft_dir, 'remove')
             except NotADirectoryError:
                 print("Кэшь повреждён!!")
+                sys.exit()
+            except FileNotFoundError:
+                print("Кэшь повреждён!!")
+                sys.exit()
             shutil.rmtree(soft_dir)
             self.change_index('delete', pkg_name)
         else:
