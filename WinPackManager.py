@@ -120,6 +120,12 @@ class LocalRepo(Repo):
 
         shutil.unpack_archive(src, dst, 'zip')
 
+    def run_script(self, soft_dir, action):
+        """Запуск скрипта с набором ключей"""
+        p = subprocess.call(['python',
+            os.path.join('', soft_dir, 'script.py'), action],
+            shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+
     def pkg_install(self, pkg_name, repo):
         """Функция устанавливает пакет с указанным именем."""
         pkg_version = repo.search(pkg_name)
@@ -132,17 +138,14 @@ class LocalRepo(Repo):
         if cachepkg_version:  # Если пакет уже установлен
             if cachepkg_version < pkg_version:
                 self.pkg_download(pkg_name, repo)
-                p = subprocess.call(['python',
-                    os.path.join('', soft_dir, 'script.py'), 'install'],
-                    shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+                self.run_script(soft_dir, 'install')
                 self.change_index('update', pkg_name, repo)
                 return 3  # Обновлён
             return 2  # Уже установлен
         else:
-            self.pkg_download(pkg_name, repo)
-            p = subprocess.call(['python',
-                os.path.join('', soft_dir, 'script.py'), 'install'],
-                shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+            if 'file' in repo[pkg_name]:
+                self.pkg_download(pkg_name, repo)
+                self.run_script(soft_dir, 'install')
             self.change_index('write', pkg_name, repo)
             return 4  # Установлен
 
@@ -151,8 +154,7 @@ class LocalRepo(Repo):
         pkg_version = self.search(pkg_name)
         if pkg_version:     # Проверяем есть ли такой
             soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
-            subprocess.call(['python', os.path.join('', soft_dir, 'script.py'),
-            'remove'], shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
+            self.run_script(soft_dir, 'remove')
             shutil.rmtree(soft_dir)
             self.change_index('delete', pkg_name)
         else:
@@ -285,7 +287,7 @@ class WPM():
                 print(e)
                 sys.exit()
             except MultiRepoCollision as e:
-                print("Пакет с таким именем присутствует сразу в несколький репозиториях")
+                print("Пакет с таким именем присутствует сразу в нескольких репозиториях")
                 print(e)
                 sys.exit()
         else:
