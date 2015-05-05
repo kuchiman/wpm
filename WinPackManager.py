@@ -281,6 +281,7 @@ class WPM():
             pkgs.pop(0)
             try:
                 repo = self.check_pkg(pkg)
+                print(type(dep))
                 return repo.list_dependences(pkg).extend(self.resolv_level_dependences(pkgs))
             except PackNameErr as e:
                 print("Пакет с таким именем не существует ")
