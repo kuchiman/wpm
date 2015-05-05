@@ -85,7 +85,8 @@ class LocalRepo(Repo):
         try:
             CACH_PKG = self.PKGLIST[pkg_name]
         except KeyError:
-            CACH_PKG = {}
+            self.PKGLIST[pkg_name] = {}
+            CACH_PKG = self.PKGLIST[pkg_name]
 
         if action == 'delete':               # Удаление записи о пакете
             del CACH_PKG
