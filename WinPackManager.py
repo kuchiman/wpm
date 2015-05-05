@@ -58,7 +58,7 @@ class LocalRepo(Repo):
         except NameError:
             try:
                 os.makedirs(self.REPO_DIR)  # Создана директория
-            except os.FileExistsError:
+            except FileExistsError:
                 pass
             open(self.INDEX, 'w+').close()  # Создан пустой индекс
             self.PKGLIST.read(self.INDEX)
@@ -156,7 +156,10 @@ class LocalRepo(Repo):
         pkg_version = self.search(pkg_name)
         if pkg_version:     # Проверяем есть ли такой
             soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
-            self.run_script(soft_dir, 'remove')
+            try:
+                self.run_script(soft_dir, 'remove')
+            except NotADirectoryError:
+                print("Кэшь повреждён!!")
             shutil.rmtree(soft_dir)
             self.change_index('delete', pkg_name)
         else:
@@ -303,7 +306,6 @@ class WPM():
         #while len(result[len(result) - 1]) > 0:
             #result.append(self.resolv_level_dependences(result[len(result) - 1]))
         dep = self.resolv_level_dependences(pkgs)
-        print(type(dep))
         while len(dep) > 0:
             result.append(dep)
             print(type(dep))
