@@ -143,7 +143,7 @@ class LocalRepo(Repo):
                 return 3  # Обновлён
             return 2  # Уже установлен
         else:
-            if 'file' in repo[pkg_name]:
+            if 'file' in repo.PKGLIST[pkg_name]:
                 self.pkg_download(pkg_name, repo)
                 self.run_script(soft_dir, 'install')
             self.change_index('write', pkg_name, repo)
@@ -276,24 +276,6 @@ class WPM():
         """Если разложить зависимости в виде дерева вниз, то эта функция
         позволяет определить зависимости пакетов на один уровень вниз. Поиск
         ведётся рекурсивно"""
-        #if len(pkgs) > 0:
-            #pkg = pkgs[0]
-            #pkgs.pop(0)
-            #result = []
-            #try:
-                #repo = self.check_pkg(pkg)
-                #print(type(repo))
-                #return repo.list_dependences(pkg).extend(self.resolv_level_dependences(pkgs))
-            #except PackNameErr as e:
-                #print("Пакет с таким именем не существует ")
-                #print(e)
-                #sys.exit()
-            #except MultiRepoCollision as e:
-                #print("Пакет с таким именем присутствует сразу в нескольких репозиториях")
-                #print(e)
-                #sys.exit()
-        #else:
-            #return result
         result = []
         for pkg in pkgs:
             try:
