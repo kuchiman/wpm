@@ -110,11 +110,11 @@ class LocalRepo(Repo):
 
         try:
             os.makedirs(name_dir)
-        except os.FileExistsError:
+        except FileExistsError:
             pass
         try:
             os.makedirs(dst)
-        except os.FileExistsError:
+        except FileExistsError:
             shutil.rmtree(dst)
             os.makedirs(dst)
 
