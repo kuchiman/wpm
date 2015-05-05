@@ -39,7 +39,7 @@ class RepoCool(configparser.ConfigParser):
 class LocalRepoCool(RepoCool):
     """Частный вид репозитория, отличается от остальных тем что может
     изменяться из программы"""
-    def __init__(self):
+    def __init__(self, name, repo_dir):
         super(LocalRepoCool, self).__init__()
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         try:
