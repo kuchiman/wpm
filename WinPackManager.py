@@ -53,7 +53,7 @@ class LocalRepo(Repo):
             #self.read_file(open(self.INDEX))
 
     def __init__(self, repo_dir):
-        self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
+        self.INDEX = os.path.join('', repo_dir, 'index.ini')
         try:
             super(LocalRepo, self).__init__('local', repo_dir )
         except FileNotFoundError:
