@@ -82,7 +82,7 @@ class LocalRepo(Repo):
             CACHE_PKG['version'] = PKG['version']
 
             if 'file' in PKG:
-                CACHE_PKG['file'] = PKG['file']
+        print((action, pkg_name, CACHE_PKG))
             elif action == 'update' and 'file' in CACHE_PKG:
                 del CACHE_PKG['file']
 
@@ -149,8 +149,6 @@ class LocalRepo(Repo):
                 except FileNotFoundError:
                     print("Кэшь повреждён!!")
                     sys.exit()
-                finally:
-                    self.write_index()
                 shutil.rmtree(soft_dir)
             self.change_index('delete', pkg_name)
         else:
@@ -302,11 +300,9 @@ class WPM():
     def remove(self, pkgs):
         """Функция удаляет пакеты переданные в кажестве аргумента"""
         dep = self.resolv_dependences(pkgs)
-        print(dep)
         for pkg in dep:
             if self.localrepo.pkg_remove(pkg):
                 print("Пакет " + pkg + " не найден!!")
-
         self.localrepo.write_index()
 
     def install(self, pkgs):
@@ -319,5 +315,4 @@ class WPM():
             else:
                 print("Пакет " + pkg + " устанавливается")
                 self.localrepo.pkg_install(pkg, repo)
-
         self.localrepo.write_index()
