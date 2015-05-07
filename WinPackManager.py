@@ -306,7 +306,7 @@ class WPM():
     def remove(self, pkgs):
         """Функция удаляет пакеты переданные в кажестве аргумента"""
         dep = self.resolv_dependences(pkgs)
-        print dep
+        print(dep)
         for pkg in dep:
             if self.localrepo.pkg_remove(pkg):
                 print("Пакет " + pkg + " не найден!!")
