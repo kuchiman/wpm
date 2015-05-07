@@ -14,7 +14,7 @@ def createParser():
 
     list_parser = subparsers.add_parser('list')
     list_parser.add_argument('what',
-        choices=['installed', 'updated'], nargs='?')
+        choices=['installed', 'update'], nargs='?')
 
     install_parser = subparsers.add_parser('install')
     install_parser.add_argument('packages', nargs='+')
@@ -38,7 +38,7 @@ if __name__ == "__main__":
             wpm.list()
         elif namespace.what == 'installed':
             wpm.list_installed()
-        elif namespace.what == 'updated':
+        elif namespace.what == 'update':
             wpm.list_update()
     elif namespace.command == "show":
         if namespace.what is None:
