@@ -153,6 +153,8 @@ class LocalRepo(Repo):
             except FileNotFoundError:
                 print("Кэшь повреждён!!")
                 sys.exit()
+            finally:
+                self.write_index()
             shutil.rmtree(soft_dir)
             self.change_index('delete', pkg_name)
         else:
