@@ -96,13 +96,14 @@ class LocalRepo(Repo):
         pkg_version = repo[pkg_name]['version']
         pkg_file = repo[pkg_name]['file']
         src = os.path.join('', repo.REPO_DIR, pkg_file)
-        name_dir = os.path.join('', self.REPO_DIR, pkg_name)
-        dst = os.path.join('', name_dir, pkg_version)
+        #name_dir = os.path.join('', self.REPO_DIR, pkg_name)
+        #dst = os.path.join('', name_dir, pkg_version)
+        dst = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
-        try:
-            os.makedirs(name_dir)
-        except FileExistsError:
-            pass
+        #try:
+            #os.makedirs(name_dir)
+        #except FileExistsError:
+            #pass
         try:
             os.makedirs(dst)
         except FileExistsError:
