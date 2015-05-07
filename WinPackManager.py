@@ -74,7 +74,7 @@ class LocalRepo(Repo):
         except KeyError:
             self[pkg_name] = {}
             CACHE_PKG = self[pkg_name]
-        print(action, pkg_name, CACHE_PKG)
+
         if action == 'delete':               # Удаление записи о пакете
             del CACHE_PKG
         else:                     # Добавление записи о пакете или обновление
@@ -82,7 +82,7 @@ class LocalRepo(Repo):
             CACHE_PKG['version'] = PKG['version']
 
             if 'file' in PKG:
-        print((action, pkg_name, CACHE_PKG))
+                CACHE_PKG['file'] = PKG['file']
             elif action == 'update' and 'file' in CACHE_PKG:
                 del CACHE_PKG['file']
 
