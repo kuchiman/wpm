@@ -15,7 +15,7 @@ class Repo(configparser.ConfigParser):
         super(Repo, self).__init__()
         self.NAME = name
         self.REPO_DIR = repo_dir
-        self.read(os.path.join('', self.REPO_DIR, 'index.ini'))
+        self.read_file(open(os.path.join('', self.REPO_DIR, 'index.ini')))
 
     def list(self):
         """Функция возвращает список доступных в репозитории пакетов"""
@@ -43,14 +43,14 @@ class LocalRepo(Repo):
         super(LocalRepo, self).__init__(name, repo_dir )
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         try:
-            self.read(self.INDEX)
-        except NameError:
+            self.read_file(open(self.INDEX))
+        except FileNotFoundError:
             try:
                 os.makedirs(self.REPO_DIR)  # Создана директория
             except FileExistsError:
                 pass
             open(self.INDEX, 'w+').close()  # Создан пустой индекс
-            self.read(self.INDEX)
+            self.read_file(open(self.INDEX))
 
     def list_update(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
@@ -184,8 +184,8 @@ class WPM():
         CONF = os.path.join('', os.path.dirname(sys.argv[0]), 'config.ini')
         config = configparser.ConfigParser()
         try:
-            config.read(CONF)
-        except NameError as e:
+            config.read_file(open(CONF))
+        except FileNotFoundError as e:
             print("Отсутствует конфигурационный файл!!")
             print(e)
             sys.exit()
@@ -194,7 +194,7 @@ class WPM():
             for name in config['REPOSITORY']:
                 try:
                     repos.append(Repo(name, config['REPOSITORY'][name]))
-                except KeyError as e:
+                except FileNotFoundError as e:
                     print("Отсутствует индекс репозитория " + self.NAME)
                     print(e)
                     sys.exit()
