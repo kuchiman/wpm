@@ -144,18 +144,19 @@ class LocalRepo(Repo):
         """Функция удаляет ранее установленный пакет"""
         pkg_version = self.search(pkg_name)
         if pkg_version:     # Проверяем есть ли такой
-            soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
-            try:
-                self.run_script(soft_dir, 'remove')
-            except NotADirectoryError:
-                print("Кэшь повреждён!!")
-                sys.exit()
-            except FileNotFoundError:
-                print("Кэшь повреждён!!")
-                sys.exit()
-            finally:
-                self.write_index()
-            shutil.rmtree(soft_dir)
+            if 'file' in self[pkg_name]:
+                soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+                try:
+                    self.run_script(soft_dir, 'remove')
+                except NotADirectoryError:
+                    print("Кэшь повреждён!!")
+                    sys.exit()
+                except FileNotFoundError:
+                    print("Кэшь повреждён!!")
+                    sys.exit()
+                finally:
+                    self.write_index()
+                shutil.rmtree(soft_dir)
             self.change_index('delete', pkg_name)
         else:
             return 1
