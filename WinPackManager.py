@@ -74,7 +74,7 @@ class LocalRepo(Repo):
         except KeyError:
             self[pkg_name] = {}
             CACHE_PKG = self[pkg_name]
-
+        print(action, pkg_name, CACHE_PKG)
         if action == 'delete':               # Удаление записи о пакете
             del CACHE_PKG
         else:                     # Добавление записи о пакете или обновление
@@ -96,14 +96,8 @@ class LocalRepo(Repo):
         pkg_version = repo[pkg_name]['version']
         pkg_file = repo[pkg_name]['file']
         src = os.path.join('', repo.REPO_DIR, pkg_file)
-        #name_dir = os.path.join('', self.REPO_DIR, pkg_name)
-        #dst = os.path.join('', name_dir, pkg_version)
         dst = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
-        #try:
-            #os.makedirs(name_dir)
-        #except FileExistsError:
-            #pass
         try:
             os.makedirs(dst)
         except FileExistsError:
@@ -144,7 +138,7 @@ class LocalRepo(Repo):
     def pkg_remove(self, pkg_name):
         """Функция удаляет ранее установленный пакет"""
         pkg_version = self.search(pkg_name)
-        if pkg_version:     # Проверяем есть ли такой
+        if pkg_version:              # Проверяем есть ли такой
             if 'file' in self[pkg_name]:
                 soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
                 try:
