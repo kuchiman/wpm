@@ -314,7 +314,10 @@ class WPM():
         dep = self.resolv_dependences(pkgs)
         for pkg in dep:
             repo = self.check_pkg(pkg)
-            print("Пакет " + pkg + " устанавливается")
-            self.localrepo.pkg_install(pkg, repo)
+            if pkg in self.localrepo:
+                print("Пакет " + pkg + " уже установлен")
+            else:
+                print("Пакет " + pkg + " устанавливается")
+                self.localrepo.pkg_install(pkg, repo)
 
         self.localrepo.write_index()
