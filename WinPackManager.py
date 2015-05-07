@@ -39,30 +39,18 @@ class Repo(configparser.ConfigParser):
 class LocalRepo(Repo):
     """Частный вид репозитория, отличается от остальных тем что может
     изменяться из программы"""
-    #def __init__(self, name, repo_dir):
-        #super(LocalRepo, self).__init__(name, repo_dir )
-        #self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
-        #try:
-            #self.read_file(open(self.INDEX))
-        #except FileNotFoundError:
-            #try:
-                #os.makedirs(self.REPO_DIR)  # Создана директория
-            #except FileExistsError:
-                #pass
-            #open(self.INDEX, 'w+').close()  # Создан пустой индекс
-            #self.read_file(open(self.INDEX))
 
     def __init__(self, repo_dir):
         self.INDEX = os.path.join('', repo_dir, 'index.ini')
         try:
-            super(LocalRepo, self).__init__('local', repo_dir )
+            super(LocalRepo, self).__init__('local', repo_dir)
         except FileNotFoundError:
             try:
                 os.makedirs(self.REPO_DIR)  # Создана директория
             except FileExistsError:
                 pass
             open(self.INDEX, 'w+').close()  # Создан пустой индекс
-            super(LocalRepo, self).__init__('local', repo_dir )
+            super(LocalRepo, self).__init__('local', repo_dir)
 
     def list_update(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
@@ -81,16 +69,17 @@ class LocalRepo(Repo):
         переменной(не в файле индекса) Первый аргумент это необходимое действие
         а второй имя пакета. Экземпляр класса Repo является необязательным для
         части операций"""
-        try:
-            CACHE_PKG = self[pkg_name]
-        except KeyError:
-            self[pkg_name] = {}
-            CACHE_PKG = self[pkg_name]
 
         if action == 'delete':               # Удаление записи о пакете
-            del CACHE_PKG
+            del self[pkg_name]
         else:                     # Добавление записи о пакете или обновление
+            try:
+                CACHE_PKG = self[pkg_name]
+            except KeyError:
+                self[pkg_name] = {}
+                CACHE_PKG = self[pkg_name]
             PKG = repo[pkg_name]
+
             CACHE_PKG['version'] = PKG['version']
 
             if 'file' in PKG:
