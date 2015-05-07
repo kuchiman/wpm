@@ -39,18 +39,30 @@ class Repo(configparser.ConfigParser):
 class LocalRepo(Repo):
     """Частный вид репозитория, отличается от остальных тем что может
     изменяться из программы"""
-    def __init__(self, name, repo_dir):
-        super(LocalRepo, self).__init__(name, repo_dir )
+    #def __init__(self, name, repo_dir):
+        #super(LocalRepo, self).__init__(name, repo_dir )
+        #self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
+        #try:
+            #self.read_file(open(self.INDEX))
+        #except FileNotFoundError:
+            #try:
+                #os.makedirs(self.REPO_DIR)  # Создана директория
+            #except FileExistsError:
+                #pass
+            #open(self.INDEX, 'w+').close()  # Создан пустой индекс
+            #self.read_file(open(self.INDEX))
+
+    def __init__(self, repo_dir):
         self.INDEX = os.path.join('', self.REPO_DIR, 'index.ini')
         try:
-            self.read_file(open(self.INDEX))
+            super(LocalRepo, self).__init__('local', repo_dir )
         except FileNotFoundError:
             try:
                 os.makedirs(self.REPO_DIR)  # Создана директория
             except FileExistsError:
                 pass
             open(self.INDEX, 'w+').close()  # Создан пустой индекс
-            self.read_file(open(self.INDEX))
+            super(LocalRepo, self).__init__('local', repo_dir )
 
     def list_update(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
@@ -194,8 +206,12 @@ class WPM():
             for name in config['REPOSITORY']:
                 try:
                     repos.append(Repo(name, config['REPOSITORY'][name]))
-                except FileNotFoundError as e:
+                except KeyError as e:
                     print("Отсутствует индекс репозитория " + self.NAME)
+                    print(e)
+                    sys.exit()
+                except FileNotFoundError as e:
+                    print("Отсутствует файл индекса " + self.NAME)
                     print(e)
                     sys.exit()
         except KeyError as e:
@@ -204,7 +220,7 @@ class WPM():
             sys.exit()
 
         try:
-            localrepo = LocalRepo('local', config['CACHE']['dir'])
+            localrepo = LocalRepo(config['CACHE']['dir'])
         except KeyError as e:
             print("Конфигурационный файл повреждён!! Не указан адрес кэша")
             print(e)
