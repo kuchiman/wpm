@@ -41,6 +41,7 @@ class LocalRepo(Repo):
     изменяться из программы"""
 
     def __init__(self, repo_dir):
+        """Конструктор локального репозиория. Имя задано в коде."""
         self.INDEX = os.path.join('', repo_dir, 'index.ini')
         try:
             super(LocalRepo, self).__init__('local', repo_dir)
@@ -85,17 +86,17 @@ class LocalRepo(Repo):
             if 'file' in PKG:
                 CACHE_PKG['file'] = PKG['file']
             elif action == 'update' and 'file' in CACHE_PKG:
-                del CACHE_PKG['file']
+                del self[pkg_name]['file']
 
             if 'dependences' in PKG:
                 CACHE_PKG['dependences'] = PKG['dependences']
             elif action == 'update' and 'dependences' in CACHE_PKG:
-                del CACHE_PKG['dependences']
+                del self[pkg_name]['dependences']
 
     def pkg_download(self, pkg_name, repo):
         """Функция загружает пакет из репозитория в кэш"""
-        pkg_version = repo[pkg_name]['version']
         pkg_file = repo[pkg_name]['file']
+        pkg_version = repo[pkg_name]['version']
         src = os.path.join('', repo.REPO_DIR, pkg_file)
         dst = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
@@ -117,22 +118,27 @@ class LocalRepo(Repo):
         """Функция устанавливает пакет с указанным именем."""
         pkg_version = repo.search(pkg_name)
         if not pkg_version:
-            return 1
+            return 1  # Нет такого пакета
 
         soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
         cachepkg_version = self.search(pkg_name)
         if cachepkg_version:  # Если пакет уже установлен
             if cachepkg_version < pkg_version:
-                self.pkg_download(pkg_name, repo)
-                self.run_script(soft_dir, 'install')
+                try:
+                    self.pkg_download(pkg_name, repo)
+                    self.run_script(soft_dir, 'install')
+                except KeyError:
+                    pass
                 self.change_index('update', pkg_name, repo)
                 return 3  # Обновлён
             return 2  # Уже установлен
         else:
-            if 'file' in repo[pkg_name]:
+            try:
                 self.pkg_download(pkg_name, repo)
                 self.run_script(soft_dir, 'install')
+            except KeyError:
+                pass
             self.change_index('write', pkg_name, repo)
             return 4  # Установлен
 
