@@ -231,8 +231,8 @@ class WPM():
             print(repo.NAME)
             print("-" * 80)
             print("\tПакет\t\t\tДоступная версия")
-            for pkg in repo.list():
-                print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+            for name, version in repo.list():
+                print("\t" + name + "\t\t\t" + version)
             print("-" * 80)
 
     def list_installed(self):
@@ -242,8 +242,8 @@ class WPM():
         print(self.localrepo.NAME)
         print("-" * 80)
         print("\tПакет\t\t\tТекущая версия")
-        for pkg in self.localrepo.list():
-            print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+        for name, version in self.localrepo.list():
+            print("\t" + name + "\t\t\t" + version)
         print("-" * 80)
 
     def list_update(self):
@@ -254,8 +254,8 @@ class WPM():
             print(repo.NAME)
             print("-" * 80)
             print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
-            for pkg in self.localrepo.list_update(repo):
-                print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
+            for name, version, new in self.localrepo.list_update(repo):
+                print("\t" + name + "\t\t\t" + version + "\t\t\t" + new)
             print("-" * 80)
 
     def check_pkg(self, pkg):
