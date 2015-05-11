@@ -19,7 +19,7 @@ class Repo(configparser.ConfigParser):
 
     def list(self):
         """Функция возвращает список доступных в репозитории пакетов"""
-        return [[name, self[name]['version']] for name in self.sections()]
+        return ([name, self[name]['version']] for name in self.sections())
 
     def search(self, pkg_name):
         """Функция ищет пакет в репозитории, если находит возвращает версию"""
