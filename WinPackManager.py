@@ -33,7 +33,7 @@ class Repo(configparser.ConfigParser):
         try:
             return self[pkg_name]['dependences'].replace(' ', '').split(",")
         except KeyError:
-            return []
+            return ()
 
 
 class LocalRepo(Repo):
@@ -55,10 +55,10 @@ class LocalRepo(Repo):
 
     def list_update(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
-        return [[name, self[name]['version'], version]
+        return ([name, self[name]['version'], version]
             for name, version in repo.list()
             if name in self
-            if self[name]['version'] < version]
+            if self[name]['version'] < version)
 
     def write_index(self):
         """Запись содержимого локальной переменной в файл индекса"""
