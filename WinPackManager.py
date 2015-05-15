@@ -19,7 +19,7 @@ class Repo(configparser.ConfigParser):
 
     def list(self):
         """Функция возвращает список доступных в репозитории пакетов"""
-        return [[name, self[name]['version']] for name in self.sections()]
+        return ([name, self[name]['version']] for name in self.sections())
 
     def search(self, pkg_name):
         """Функция ищет пакет в репозитории, если находит возвращает версию"""
@@ -33,7 +33,7 @@ class Repo(configparser.ConfigParser):
         try:
             return self[pkg_name]['dependences'].replace(' ', '').split(",")
         except KeyError:
-            return []
+            return ()
 
 
 class LocalRepo(Repo):
@@ -55,10 +55,10 @@ class LocalRepo(Repo):
 
     def list_update(self, repo):
         """Функция выводит список доступных для обновления пакетов"""
-        return [[name, self[name]['version'], version]
+        return ([name, self[name]['version'], version]
             for name, version in repo.list()
             if name in self
-            if self[name]['version'] < version]
+            if self[name]['version'] < version)
 
     def write_index(self):
         """Запись содержимого локальной переменной в файл индекса"""
@@ -232,8 +232,8 @@ class WPM():
             print(repo.NAME)
             print("-" * 80)
             print("\tПакет\t\t\tДоступная версия")
-            for pkg in repo.list():
-                print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+            for name, version in repo.list():
+                print("\t" + name + "\t\t\t" + version)
             print("-" * 80)
 
     def list_installed(self):
@@ -243,8 +243,8 @@ class WPM():
         print(self.localrepo.NAME)
         print("-" * 80)
         print("\tПакет\t\t\tТекущая версия")
-        for pkg in self.localrepo.list():
-            print("\t" + pkg[0] + "\t\t\t" + pkg[1])
+        for name, version in self.localrepo.list():
+            print("\t" + name + "\t\t\t" + version)
         print("-" * 80)
 
     def list_update(self):
@@ -255,8 +255,8 @@ class WPM():
             print(repo.NAME)
             print("-" * 80)
             print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
-            for pkg in self.localrepo.list_update(repo):
-                print("\t" + pkg[0] + "\t\t\t" + pkg[1] + "\t\t\t" + pkg[2])
+            for name, version, new in self.localrepo.list_update(repo):
+                print("\t" + name + "\t\t\t" + version + "\t\t\t" + new)
             print("-" * 80)
 
     def check_pkg(self, pkg):
