@@ -147,7 +147,8 @@ class LocalRepo(Repo):
         pkg_version = self.search(pkg_name)
         if pkg_version:              # Проверяем есть ли такой
             if 'file' in self[pkg_name]:
-                soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
+                soft_dir = os.path.join('', self.REPO_DIR, pkg_name,
+                    pkg_version)
                 try:
                     self.run_script(soft_dir, 'remove')
                 except NotADirectoryError:
