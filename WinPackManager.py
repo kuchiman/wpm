@@ -111,7 +111,8 @@ class LocalRepo(Repo):
     def run_script(self, soft_dir, action):
         """Запуск скрипта с набором ключей"""
         p = subprocess.call(['python',
-            os.path.join('', soft_dir, 'script.py'), action],
+            os.path.join('', soft_dir, 'script.py'),
+            os.path.dirname(sys.argv[0]), action],
             shell=False, stdout=subprocess.PIPE, cwd=soft_dir)
 
     def pkg_install(self, pkg_name, repo):
