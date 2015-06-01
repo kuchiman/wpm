@@ -2,6 +2,7 @@ import os
 import sys
 import platform
 import subprocess
+import shutil
 
 if platform.machine() == 'AMD64':
     ARCH = '64'
@@ -36,3 +37,7 @@ def run_msi(*command):
     p = subprocess.call(['msiexec', '/qn'] + list(command),
         shell=False, stdout=subprocess.PIPE)
     return p
+
+
+def copy(src, dst):
+    shutil.copy(os.path.join('', DIR, src), dst)
