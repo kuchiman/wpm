@@ -323,9 +323,13 @@ class WPM():
         dep = self.resolv_dependences(pkgs)
         for pkg in dep:
             repo = self.check_pkg(pkg)
-            if pkg in self.localrepo:
+            res = self.localrepo.pkg_install(pkg, repo)
+            if res == 1:
+                print("Пакета " + pkg + " не существует")
+            elif res == 2:
                 print("Пакет " + pkg + " уже установлен")
-            else:
-                print("Пакет " + pkg + " устанавливается")
-                self.localrepo.pkg_install(pkg, repo)
+            elif res == 3:
+                print("Пакет " + pkg + " обновлён")
+            elif res == 4:
+                print("Пакет " + pkg + " установлен")
         self.localrepo.write_index()
