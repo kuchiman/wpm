@@ -39,5 +39,11 @@ def run_msi(*command):
     return p
 
 
+def run_cmd(*command):
+    p = subprocess.call(list(command),
+        shell=False, stdout=subprocess.PIPE)
+    return p
+
+
 def copy(src, dst):
     shutil.copy(os.path.join('', DIR, src), dst)
