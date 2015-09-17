@@ -1,7 +1,6 @@
 import sys
 import argparse
 from WinPackManager import WPM
-#  dependence branch
 
 
 wpm = WPM()

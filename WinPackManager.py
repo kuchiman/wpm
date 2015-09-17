@@ -195,8 +195,8 @@ class WPM():
         try:
             config.read_file(open(CONF))
         except FileNotFoundError as e:
-            print("Отсутствует конфигурационный файл!!")
-            print(e)
+            print("Отсутствует конфигурационный файл!!\n%s" % e)
+            #print(e)
             sys.exit()
 
         try:
@@ -204,23 +204,23 @@ class WPM():
                 try:
                     repos.append(Repo(name, config['REPOSITORY'][name]))
                 except KeyError as e:
-                    print("Отсутствует индекс репозитория " + self.NAME)
-                    print(e)
+                    print("Отсутствует индекс репозитория %s\n%s" % (self.NAME, e))
+                    #print(e)
                     sys.exit()
                 except FileNotFoundError as e:
-                    print("Отсутствует файл индекса " + self.NAME)
-                    print(e)
+                    print("Отсутствует файл индекса %s\n%s" % (self.NAME, e))
+                    #print(e)
                     sys.exit()
         except KeyError as e:
-            print('Не указан адрес репозитория!!')
-            print(e)
+            print('Не указан адрес репозитория!!\n%s' % e)
+            #print(e)
             sys.exit()
 
         try:
             localrepo = LocalRepo(config['CACHE']['dir'])
         except KeyError as e:
-            print("Конфигурационный файл повреждён!! Не указан адрес кэша")
-            print(e)
+            print("Конфигурационный файл повреждён!! Не указан адрес кэша\n%s" % e)
+            #print(e)
             sys.exit()
 
         return localrepo, repos
@@ -234,7 +234,7 @@ class WPM():
             print("-" * 80)
             print("\tПакет\t\t\tДоступная версия")
             for name, version in repo.list():
-                print("\t" + name + "\t\t\t" + version)
+                print("\t%s\t\t\t%s" % (name, version))
             print("-" * 80)
 
     def list_installed(self):
@@ -245,7 +245,7 @@ class WPM():
         print("-" * 80)
         print("\tПакет\t\t\tТекущая версия")
         for name, version in self.localrepo.list():
-            print("\t" + name + "\t\t\t" + version)
+            print("\t%s\t\t\t%s" % (name, version))
         print("-" * 80)
 
     def list_update(self):
@@ -257,7 +257,7 @@ class WPM():
             print("-" * 80)
             print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
             for name, version, new in self.localrepo.list_update(repo):
-                print("\t" + name + "\t\t\t" + version + "\t\t\t" + new)
+                print("\t%s\t\t\t%s\t\t\t%s" % (name, version, new))
             print("-" * 80)
 
     def check_pkg(self, pkg):
@@ -289,12 +289,11 @@ class WPM():
                 repo = self.check_pkg(pkg)
                 result.extend(repo.list_dependences(pkg))
             except PackNameErr as e:
-                print("Пакет с именем " + e.pkg_name + " не существует.")
+                print("Пакет с именем %s не существует." % e.pkg_name)
                 sys.exit()
             except MultiRepoCollision as e:
-                print("Пакет с именем " + e.pkg_name +
-                    " присутствует сразу в нескольких репозиториях")
-                print(e.repos)
+                print("Пакет с именем %s присутствует сразу в нескольких репозиториях\n%s" % (e.pkg_name, e.repos))
+                #print(e.repos)
                 sys.exit()
         return result
 
@@ -315,7 +314,7 @@ class WPM():
         dep = self.resolv_dependences(pkgs)
         for pkg in dep:
             if self.localrepo.pkg_remove(pkg):
-                print("Пакет " + pkg + " не найден!!")
+                print("Пакет %s не найден!!" % pkg)
         self.localrepo.write_index()
 
     def install(self, pkgs):
@@ -325,11 +324,11 @@ class WPM():
             repo = self.check_pkg(pkg)
             res = self.localrepo.pkg_install(pkg, repo)
             if res == 1:
-                print("Пакета " + pkg + " не существует")
+                print("Пакета %s не существует" % pkg)
             elif res == 2:
-                print("Пакет " + pkg + " уже установлен")
+                print("Пакет %s уже установлен" % pkg)
             elif res == 3:
-                print("Пакет " + pkg + " обновлён")
+                print("Пакет %s обновлён" % pkg)
             elif res == 4:
-                print("Пакет " + pkg + " установлен")
+                print("Пакет %s установлен" % pkg)
         self.localrepo.write_index()
