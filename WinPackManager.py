@@ -223,7 +223,7 @@ class WPM():
 
         return localrepo, repos
 
-    def table_print(self, title, columns):
+    def table_print(self, title=None, columns=None, nextt=False):
         """Функция форматирует вывод в виде таблички , ширина 80 заков, размеры
         всех полей заданы прямо в коде. Возможно когда то перепишу на
         вычисляемые по ширине терминала"""
@@ -231,36 +231,45 @@ class WPM():
             " " * (m - len(s))) if len(s) <= m else (s[:m - 1], '')
         listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
 
-        print("-" * 80)
-        print("|%s%s|" % space(title, 78))
-        print("-" * 80)
-        if len(columns[0]) == 3:
-            for c in columns:
-                print("|%s%s|%s%s|%s%s|" %
-                    tuple(listmerge(space(c[0], 26), space(c[1], 25),
-                    space(c[2], 25))))
-        elif len(columns[0]) == 2:
-            for c in columns:
-                print("|%s%s|%s%s|" %
-                    tuple(listmerge(space(c[0], 26), space(c[1], 25))))
-        print("-" * 80)
+        if not nextt:
+            print("-" * 80)
+        if title is not None:
+            print("|%s%s|" % space(title, 78))
+            print("-" * 80)
+        if columns is not None:
+            if len(columns[0]) == 3:
+                for c in columns:
+                    print("|%s%s|%s%s|%s%s|" %
+                        tuple(listmerge(space(c[0], 26), space(c[1], 25),
+                        space(c[2], 25))))
+            elif len(columns[0]) == 2:
+                for c in columns:
+                    print("|%s%s|%s%s|" %
+                        tuple(listmerge(space(c[0], 26), space(c[1], 25))))
+            elif len(columns[0]) == 1:
+                for c in columns:
+                    print("|%s%s|" % tuple(listmerge(space(c[0], 78))))
+            print("-" * 80)
 
     def list(self):
-        print("\tДоступны следующие пакеты.")
+        #print("\tДоступны следующие пакеты.")
+        self.table_print(title="\Доступны следующие пакеты.")
         for repo in self.repos:
-            self.table_print(repo.NAME,
-                repo.list().insert(0, ("Пакет", "Доступная версия")))
+            self.table_print(repo.NAME, ("Пакет", "Доступная версия"), True)
+            self.table_print(columns=repo.list(), nextt=True)
 
     def list_installed(self):
         self.table_print("Установлены следующие пакеты",
-            self.localrepo.list().insert(0, ("Пакет", "Текущая версия")))
+            ("Пакет", "Текущая версия"))
+        self.table_print(columns=self.localrepo.list(), nextt=True)
 
     def list_update(self):
-        print("\tДоступны следующие обновления.")
+        self.table_print(title="Доступны следующие обновления.")
         for repo in self.repos:
             self.table_print(repo.NAME,
-                self.localrepo.list_update(repo).insert(0,
-                ("Пакет", "Текущая версия", "Доступная версия")))
+                ("Пакет", "Текущая версия", "Доступная версия"), True)
+            self.table_print(repo.NAME, self.localrepo.list_update(repo),
+                nextt=True)
 
     def check_pkg(self, pkg):
         """Функция проверяет есть ли пакет с таким именем и если есть то в
