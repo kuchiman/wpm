@@ -222,7 +222,7 @@ class WPM():
 
         return localrepo, repos
 
-    def table_print(self, title=None, columns=None, nextt=False):
+    def table_print(self, title, columns, nextt=False):
         """Функция форматирует вывод в виде таблички , ширина 80 заков, размеры
         всех полей заданы прямо в коде. Возможно когда то перепишу на
         вычисляемые по ширине терминала"""
@@ -253,8 +253,7 @@ class WPM():
     def list(self):
         self.table_print(title="Доступны следующие пакеты")
         for repo in self.repos:
-            self.table_print(repo.NAME,
-                tuple("Пакет", "Доступная версия"), True)
+            self.table_print(repo.NAME, ("Пакет", "Доступная версия"), True)
             self.table_print(columns=repo.list(), nextt=True)
 
     def list_installed(self):
