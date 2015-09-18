@@ -252,7 +252,6 @@ class WPM():
             print("-" * 80)
 
     def list(self):
-        #print("\tДоступны следующие пакеты.")
         self.table_print(title="\Доступны следующие пакеты.")
         for repo in self.repos:
             self.table_print(repo.NAME, ("Пакет", "Доступная версия"), True)
