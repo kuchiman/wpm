@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import sys
 import shutil
@@ -222,29 +224,28 @@ class WPM():
 
         return localrepo, repos
 
-    def table_print(self, title='', columns=tuple(), nextt=False):
+    def table_print(self, title='', columns='', nextt=False):
         """Функция форматирует вывод в виде таблички , ширина 80 заков, размеры
         всех полей заданы прямо в коде. Возможно когда то перепишу на
         вычисляемые по ширине терминала"""
         space = lambda s, m: (s,
             " " * (m - len(s))) if len(s) <= m else (s[:m - 1], '')
         listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
-
         if not nextt:
             print("-" * 80)
-        if title is not '':
+        if title:
             print("|%s%s|" % space(title, 78))
             print("-" * 80)
-        if len(columns) is not 0:
+        if columns:
             if len(columns[0]) == 3:
                 for c in columns:
                     print("|%s%s|%s%s|%s%s|" %
-                        tuple(listmerge(space(c[0], 26), space(c[1], 25),
-                        space(c[2], 25))))
+                        tuple(listmerge((space(c[0], 26), space(c[1], 25),
+                        space(c[2], 25)))))
             elif len(columns[0]) == 2:
                 for c in columns:
                     print("|%s%s|%s%s|" %
-                        tuple(listmerge(space(c[0], 26), space(c[1], 25))))
+                        tuple(listmerge((space(c[0], 39), space(c[1], 38)))))
             elif len(columns[0]) == 1:
                 for c in columns:
                     print("|%s%s|" % tuple(listmerge(space(c[0], 78))))
@@ -253,20 +254,23 @@ class WPM():
     def list(self):
         self.table_print(title="Доступны следующие пакеты")
         for repo in self.repos:
-            self.table_print(repo.NAME, ("Пакет", "Доступная версия"), True)
-            self.table_print(columns=repo.list(), nextt=True)
+            self.table_print(title=repo.NAME,
+                columns=(('Пакет', 'Доступная версия'),), nextt=True)
+            self.table_print(columns=tuple(repo.list()), nextt=True)
 
     def list_installed(self):
-        self.table_print("Установлены следующие пакеты",
-            ("Пакет", "Текущая версия"))
-        self.table_print(columns=self.localrepo.list(), nextt=True)
+        self.table_print(title="Установлены следующие пакеты",
+            columns=(("Пакет", "Текущая версия"),))
+        self.table_print(columns=tuple(self.localrepo.list()), nextt=True)
 
     def list_update(self):
         self.table_print(title="Доступны следующие обновления.")
         for repo in self.repos:
             self.table_print(repo.NAME,
-                ("Пакет", "Текущая версия", "Доступная версия"), True)
-            self.table_print(repo.NAME, self.localrepo.list_update(repo),
+                columns=(("Пакет", "Текущая версия", "Доступная версия"),),
+                nextt=True)
+            self.table_print(title=repo.NAME,
+                columns=tuple(self.localrepo.list_update(repo)),
                 nextt=True)
 
     def check_pkg(self, pkg):
