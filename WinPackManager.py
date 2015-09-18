@@ -235,14 +235,14 @@ class WPM():
         print("|%s%s|" % space(title, 78))
         print("-" * 80)
         if len(columns[0]) == 3:
-            for c1, c2, c3 in columns:
+            for c in columns:
                 print("|%s%s|%s%s|%s%s|" %
-                    tuple(listmerge(space(c1, 26), space(c2, 25),
-                    space(c3, 25))))
+                    tuple(listmerge(space(c[0], 26), space(c[1], 25),
+                    space(c[2], 25))))
         elif len(columns[0]) == 2:
-            for c1, c2 in columns:
+            for c in columns:
                 print("|%s%s|%s%s|" %
-                    tuple(listmerge(space(c1, 26), space(c2, 25))))
+                    tuple(listmerge(space(c[0], 26), space(c[1], 25))))
         print("-" * 80)
 
     def list(self):
