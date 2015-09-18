@@ -196,7 +196,6 @@ class WPM():
             config.read_file(open(CONF))
         except FileNotFoundError as e:
             print("Отсутствует конфигурационный файл!!\n%s" % e)
-            #print(e)
             sys.exit()
 
         try:
@@ -204,61 +203,93 @@ class WPM():
                 try:
                     repos.append(Repo(name, config['REPOSITORY'][name]))
                 except KeyError as e:
-                    print("Отсутствует индекс репозитория %s\n%s" % (self.NAME, e))
-                    #print(e)
+                    print("Отсутствует индекс репозитория %s\n%s"
+                        % (self.NAME, e))
                     sys.exit()
                 except FileNotFoundError as e:
                     print("Отсутствует файл индекса %s\n%s" % (self.NAME, e))
-                    #print(e)
                     sys.exit()
         except KeyError as e:
             print('Не указан адрес репозитория!!\n%s' % e)
-            #print(e)
             sys.exit()
 
         try:
             localrepo = LocalRepo(config['CACHE']['dir'])
         except KeyError as e:
-            print("Конфигурационный файл повреждён!! Не указан адрес кэша\n%s" % e)
-            #print(e)
+            print("Конфигурационный файл повреждён!! Не указан адрес кэша\n%s"
+                % e)
             sys.exit()
 
         return localrepo, repos
 
+    def table_print(self, title, column):
+
+        def space(string, maximum):
+            if len(string) <= maximum:
+                return string, " " * (maximum - len(string))
+            else:
+                return string[0:maximum - 1], ''
+
+        title_space = " " * (78 - len(title))
+        print("-" * 80)
+        print("|%s%s|" % (title, title_space))
+        print("-" * 80)
+        if len(column[0]) == 3:
+            for c1, c2, c3 in column:
+                c1, c1_space = space(c1, 26)
+                c2, c2_space = space(c1, 25)
+                c3, c3_space = space(c1, 25)
+                print("|%s%s|%s%s|%s%s|" %
+                    (c1, c1_space, c2, c2_space, c3, c3_space))
+            print("-" * 80)
+        elif len(column[0]) == 2:
+            for c1, c2 in column:
+                c1, c1_space = space(c1, 39)
+                c2, c2_space = space(c1, 38)
+                print("|%s%s|%s%s|" % (c1, c1_space, c2, c2_space))
+            print("-" * 80)
+
     def list(self):
-        print("-" * 80)
+        #print("-" * 80)
         print("\tДоступны следующие пакеты.")
-        print("-" * 80)
+        #print("-" * 80)
         for repo in self.repos:
-            print(repo.NAME)
-            print("-" * 80)
-            print("\tПакет\t\t\tДоступная версия")
-            for name, version in repo.list():
-                print("\t%s\t\t\t%s" % (name, version))
-            print("-" * 80)
+            #print(repo.NAME)
+            #print("-" * 80)
+            #print("\tПакет\t\t\tДоступная версия")
+            #for name, version in repo.list():
+                #print("\t%s\t\t\t%s" % (name, version))
+            #print("-" * 80)
+            self.table_print(repo.NAME,
+                repo.list().insert(0, ("Пакет", "Доступная версия")))
 
     def list_installed(self):
-        print("-" * 80)
-        print("\tУстановлены следующие пакеты.")
-        print("-" * 80)
-        print(self.localrepo.NAME)
-        print("-" * 80)
-        print("\tПакет\t\t\tТекущая версия")
-        for name, version in self.localrepo.list():
-            print("\t%s\t\t\t%s" % (name, version))
-        print("-" * 80)
+        #print("-" * 80)
+        #print("\tУстановлены следующие пакеты.")
+        #print("-" * 80)
+        #print(self.localrepo.NAME)
+        #print("-" * 80)
+        #print("\tПакет\t\t\tТекущая версия")
+        #for name, version in self.localrepo.list():
+            #print("\t%s\t\t\t%s" % (name, version))
+        #print("-" * 80)
+        self.table_print("Установлены следующие пакеты",
+            self.localrepo.list().insert(0, ("Пакет", "Текущая версия")))
 
     def list_update(self):
-        print("-" * 80)
+        #print("-" * 80)
         print("\tДоступны следующие обновления.")
-        print("-" * 80)
+        #print("-" * 80)
         for repo in self.repos:
-            print(repo.NAME)
-            print("-" * 80)
-            print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
-            for name, version, new in self.localrepo.list_update(repo):
-                print("\t%s\t\t\t%s\t\t\t%s" % (name, version, new))
-            print("-" * 80)
+            #print(repo.NAME)
+            #print("-" * 80)
+            #print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
+            #for name, version, new in self.localrepo.list_update(repo):
+                #print("\t%s\t\t\t%s\t\t\t%s" % (name, version, new))
+            #print("-" * 80)
+            self.table_print(repo.NAME,
+                self.localrepo.list_update(repo).insert(0,
+                ("Пакет", "Текущая версия", "Доступная версия")))
 
     def check_pkg(self, pkg):
         """Функция проверяет есть ли пакет с таким именем и если есть то в
@@ -274,11 +305,6 @@ class WPM():
             raise MultiRepoCollision(pkg, pkg_in)
         return pkg_in[0]
 
-    #def list_dependences(self, pkgs):
-        #for pkg in pkgs:
-            #for r in self.repos:
-                #if r.search(pkg):
-
     def resolv_level_dependences(self, pkgs):
         """Если разложить зависимости в виде дерева вниз, то эта функция
         позволяет определить зависимости пакетов на один уровень вниз. Поиск
@@ -292,8 +318,8 @@ class WPM():
                 print("Пакет с именем %s не существует." % e.pkg_name)
                 sys.exit()
             except MultiRepoCollision as e:
-                print("Пакет с именем %s присутствует сразу в нескольких репозиториях\n%s" % (e.pkg_name, e.repos))
-                #print(e.repos)
+                print("Пакет с именем %s присутствует сразу в нескольких \
+                репозиториях\n%s" % (e.pkg_name, e.repos))
                 sys.exit()
         return result
 
