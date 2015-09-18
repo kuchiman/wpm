@@ -237,56 +237,31 @@ class WPM():
         if len(column[0]) == 3:
             for c1, c2, c3 in column:
                 c1, c1_space = space(c1, 26)
-                c2, c2_space = space(c1, 25)
-                c3, c3_space = space(c1, 25)
+                c2, c2_space = space(c2, 25)
+                c3, c3_space = space(c3, 25)
                 print("|%s%s|%s%s|%s%s|" %
                     (c1, c1_space, c2, c2_space, c3, c3_space))
             print("-" * 80)
         elif len(column[0]) == 2:
             for c1, c2 in column:
                 c1, c1_space = space(c1, 39)
-                c2, c2_space = space(c1, 38)
+                c2, c2_space = space(c2, 38)
                 print("|%s%s|%s%s|" % (c1, c1_space, c2, c2_space))
             print("-" * 80)
 
     def list(self):
-        #print("-" * 80)
         print("\tДоступны следующие пакеты.")
-        #print("-" * 80)
         for repo in self.repos:
-            #print(repo.NAME)
-            #print("-" * 80)
-            #print("\tПакет\t\t\tДоступная версия")
-            #for name, version in repo.list():
-                #print("\t%s\t\t\t%s" % (name, version))
-            #print("-" * 80)
             self.table_print(repo.NAME,
                 repo.list().insert(0, ("Пакет", "Доступная версия")))
 
     def list_installed(self):
-        #print("-" * 80)
-        #print("\tУстановлены следующие пакеты.")
-        #print("-" * 80)
-        #print(self.localrepo.NAME)
-        #print("-" * 80)
-        #print("\tПакет\t\t\tТекущая версия")
-        #for name, version in self.localrepo.list():
-            #print("\t%s\t\t\t%s" % (name, version))
-        #print("-" * 80)
         self.table_print("Установлены следующие пакеты",
             self.localrepo.list().insert(0, ("Пакет", "Текущая версия")))
 
     def list_update(self):
-        #print("-" * 80)
         print("\tДоступны следующие обновления.")
-        #print("-" * 80)
         for repo in self.repos:
-            #print(repo.NAME)
-            #print("-" * 80)
-            #print("\tПакет\t\t\tТекущая версия\t\t\tДоступная версия")
-            #for name, version, new in self.localrepo.list_update(repo):
-                #print("\t%s\t\t\t%s\t\t\t%s" % (name, version, new))
-            #print("-" * 80)
             self.table_print(repo.NAME,
                 self.localrepo.list_update(repo).insert(0,
                 ("Пакет", "Текущая версия", "Доступная версия")))
