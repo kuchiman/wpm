@@ -254,7 +254,7 @@ class WPM():
         self.table_print(title="Доступны следующие пакеты")
         for repo in self.repos:
             self.table_print(title=repo.NAME,
-                columns=("Пакет", "Доступная версия",), nextt=True)
+                tuple("Пакет", "Доступная версия"), nextt=True)
             self.table_print(columns=repo.list(), nextt=True)
 
     def list_installed(self):
