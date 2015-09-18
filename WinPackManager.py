@@ -227,12 +227,11 @@ class WPM():
         def space(string, maximum):
             if len(string) <= maximum:
                 return string, " " * (maximum - len(string))
-            else:
-                return string[0:maximum - 1], ''
+            return string[0:maximum - 1], ''
 
-        title_space = " " * (78 - len(title))
+        #title, title_space = space(title, 78)
         print("-" * 80)
-        print("|%s%s|" % (title, title_space))
+        print("|%s%s|" % space(title, 78))
         print("-" * 80)
         if len(column[0]) == 3:
             for c1, c2, c3 in column:
@@ -299,7 +298,7 @@ class WPM():
         return result
 
     def resolv_dependences(self, pkgs):
-        """Функция использяю предыдущую функцию поиска зависимостей на уровне,
+        """Функция используяю предыдущую функцию поиска зависимостей на уровне,
         проходит вниз по дереву зависимостей, до тех пор пока все зависимости
         не будут найдены"""
         result = []
