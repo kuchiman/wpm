@@ -223,7 +223,7 @@ class WPM():
 
         return localrepo, repos
 
-    def table_print(self, title, column):
+    def table_print(self, title, columns):
 
         space = lambda s, m: (s, " " * (m - len(s))) if len(s) < m else (s[:m - 1], '')
         listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
@@ -231,13 +231,13 @@ class WPM():
         print("-" * 80)
         print("|%s%s|" % space(title, 78))
         print("-" * 80)
-        if len(column[0]) == 3:
-            for c1, c2, c3 in column:
+        if len(columns[0]) == 3:
+            for c1, c2, c3 in columns:
                 print("|%s%s|%s%s|%s%s|" %
                     tuple(listmerge(space(c1, 26), space(c2, 25),
                     space(c3, 25))))
-        elif len(column[0]) == 2:
-            for c1, c2 in column:
+        elif len(columns[0]) == 2:
+            for c1, c2 in columns:
                 print("|%s%s|%s%s|" %
                     tuple(listmerge(space(c1, 26), space(c2, 25))))
         print("-" * 80)
@@ -305,16 +305,14 @@ class WPM():
 
     def remove(self, pkgs):
         """Функция удаляет пакеты переданные в кажестве аргумента"""
-        dep = self.resolv_dependences(pkgs)
-        for pkg in dep:
+        for pkg in self.resolv_dependences(pkgs):
             if self.localrepo.pkg_remove(pkg):
                 print("Пакет %s не найден!!" % pkg)
         self.localrepo.write_index()
 
     def install(self, pkgs):
         """Функция устанавливает пакеты переданные в качестве списка"""
-        dep = self.resolv_dependences(pkgs)
-        for pkg in dep:
+        for pkg in self.resolv_dependences(pkgs):
             repo = self.check_pkg(pkg)
             res = self.localrepo.pkg_install(pkg, repo)
             if res == 1:
