@@ -225,12 +225,9 @@ class WPM():
 
     def table_print(self, title, column):
 
-        def space(string, maximum):
-            if len(string) <= maximum:
-                return string, " " * (maximum - len(string))
-            return string[0:maximum - 1], ''
-
+        space = lambda s, m: (s, " " * (m - len(s))) if len(s) < m else (s[:m - 1], '')
         listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
+
         print("-" * 80)
         print("|%s%s|" % space(title, 78))
         print("-" * 80)
