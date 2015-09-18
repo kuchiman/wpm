@@ -224,8 +224,11 @@ class WPM():
         return localrepo, repos
 
     def table_print(self, title, columns):
-
-        space = lambda s, m: (s, " " * (m - len(s))) if len(s) < m else (s[:m - 1], '')
+        """Функция форматирует вывод в виде таблички , ширина 80 заков, размеры
+        всех полей заданы прямо в коде. Возможно когда то перепишу на
+        вычисляемые по ширине терминала"""
+        space = lambda s, m: (s,
+            " " * (m - len(s))) if len(s) <= m else (s[:m - 1], '')
         listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
 
         print("-" * 80)
