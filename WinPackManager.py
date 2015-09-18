@@ -3,6 +3,7 @@ import sys
 import shutil
 import subprocess
 import configparser
+from functools import reduce
 
 
 class Repo(configparser.ConfigParser):
@@ -229,24 +230,20 @@ class WPM():
                 return string, " " * (maximum - len(string))
             return string[0:maximum - 1], ''
 
-        #title, title_space = space(title, 78)
+        listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
         print("-" * 80)
         print("|%s%s|" % space(title, 78))
         print("-" * 80)
         if len(column[0]) == 3:
             for c1, c2, c3 in column:
-                c1, c1_space = space(c1, 26)
-                c2, c2_space = space(c2, 25)
-                c3, c3_space = space(c3, 25)
                 print("|%s%s|%s%s|%s%s|" %
-                    (c1, c1_space, c2, c2_space, c3, c3_space))
-            print("-" * 80)
+                    tuple(listmerge(space(c1, 26), space(c2, 25),
+                    space(c3, 25))))
         elif len(column[0]) == 2:
             for c1, c2 in column:
-                c1, c1_space = space(c1, 39)
-                c2, c2_space = space(c2, 38)
-                print("|%s%s|%s%s|" % (c1, c1_space, c2, c2_space))
-            print("-" * 80)
+                print("|%s%s|%s%s|" %
+                    tuple(listmerge(space(c1, 26), space(c2, 25))))
+        print("-" * 80)
 
     def list(self):
         print("\tДоступны следующие пакеты.")
