@@ -124,23 +124,22 @@ class LocalRepo(Repo):
 
         soft_dir = os.path.join('', self.REPO_DIR, pkg_name, pkg_version)
 
-        cachepkg_version = self.search(pkg_name)
-        if cachepkg_version:  # Если пакет уже установлен
-            if cachepkg_version < pkg_version:
-                try:
-                    self.pkg_download(pkg_name, repo)
-                    self.run_script(soft_dir, 'install')
-                except KeyError:
-                    pass
-                self.change_index('update', pkg_name, repo)
-                return 3  # Обновлён
-            return 2  # Уже установлен
-        else:
+        def install():
             try:
                 self.pkg_download(pkg_name, repo)
                 self.run_script(soft_dir, 'install')
             except KeyError:
                 pass
+
+        cachepkg_version = self.search(pkg_name)
+        if cachepkg_version:  # Если пакет уже установлен
+            if cachepkg_version < pkg_version:
+                install()
+                self.change_index('update', pkg_name, repo)
+                return 3  # Обновлён
+            return 2  # Уже установлен
+        else:
+            install()
             self.change_index('write', pkg_name, repo)
             return 4  # Установлен
 
