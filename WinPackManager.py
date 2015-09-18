@@ -222,7 +222,7 @@ class WPM():
 
         return localrepo, repos
 
-    def table_print(self, title, columns, nextt=False):
+    def table_print(self, title='', columns=tuple(), nextt=False):
         """Функция форматирует вывод в виде таблички , ширина 80 заков, размеры
         всех полей заданы прямо в коде. Возможно когда то перепишу на
         вычисляемые по ширине терминала"""
@@ -232,10 +232,10 @@ class WPM():
 
         if not nextt:
             print("-" * 80)
-        if title is not None:
+        if title is not '':
             print("|%s%s|" % space(title, 78))
             print("-" * 80)
-        if columns is not None:
+        if len(columns) is not 0:
             if len(columns[0]) == 3:
                 for c in columns:
                     print("|%s%s|%s%s|%s%s|" %
