@@ -231,7 +231,7 @@ class WPM():
             space = lambda s, m: (s,
                 " " * (m - len(s))) if len(s) <= m else (s[:m - 1], '')
             listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
-            maximum = shutil.get_terminal_size((80, 20))[0]
+            maximum = shutil.get_terminal_size((80, 20))[0] - 1
 
             def cwidth(cn):
                 "Функция вычисляет ширину каждого из столбцов"
@@ -250,7 +250,7 @@ class WPM():
             if columns:
                 sp = cwidth(len(columns[0]))
                 for c in columns:
-                    print("|%s%s" * len(columns[0]) + "|" %
+                    print(("|%s%s" * len(columns[0]) + "|") %
                         tuple(listmerge(
                             [space(c[i], sp[i]) for i in range(len(c))])))
                 print("-" * maximum)
