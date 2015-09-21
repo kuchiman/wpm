@@ -113,7 +113,7 @@ class LocalRepo(Repo):
         shutil.unpack_archive(src, dst, 'zip')
 
     def run_script(self, soft_dir, action):
-        """Запуск скрипта с набором ключей"""
+        """Запуск скрипта установки с набором ключей"""
         p = subprocess.call(['python',
             os.path.join('', soft_dir, 'script.py'),
             os.path.dirname(sys.argv[0]), action],
@@ -305,7 +305,7 @@ class WPM():
                 sys.exit()
             except MultiRepoCollision as e:
                 print("Пакет с именем %s присутствует сразу в нескольких \
-                репозиториях\n%s" % (e.pkg_name, e.repos))
+                    репозиториях\n%s" % (e.pkg_name, e.repos))
                 sys.exit()
         return result
 
