@@ -309,8 +309,8 @@ class WPM():
         """Функция используяю предыдущую функцию поиска зависимостей на уровне,
         проходит вниз по дереву зависимостей, до тех пор пока все зависимости
         не будут найдены"""
-        result = []
-        result.append(pkgs)
+        result = [].append(pkgs)
+        #result.append(pkgs)
         dep = self.resolv_level_dependences(pkgs)
         while len(dep) > 0:
             result.append(dep)
