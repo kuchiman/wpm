@@ -295,19 +295,18 @@ class WPM():
         """Если разложить зависимости в виде дерева вниз, то эта функция
         позволяет определить зависимости пакетов на один уровень вниз. Поиск
         ведётся рекурсивно"""
-        result = []
-        for pkg in pkgs:
-            try:
-                repo = self.check_pkg(pkg)
-                result.extend(repo.list_dependences(pkg))
-            except PackNameErr as e:
-                print("Пакет с именем %s не существует." % e.pkg_name)
-                sys.exit()
-            except MultiRepoCollision as e:
-                print("Пакет с именем %s присутствует сразу в нескольких \
-                    репозиториях\n%s" % (e.pkg_name, e.repos))
-                sys.exit()
-        return result
+        listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
+        try:
+            result = [self.check_pkg(pkg).list_dependences(pkg)
+                for pkg in pkgs if self.check_pkg(pkg)]
+        except PackNameErr as e:
+            print("Пакет с именем %s не существует." % e.pkg_name)
+            sys.exit()
+        except MultiRepoCollision as e:
+            print("Пакет с именем %s присутствует сразу в нескольких \
+                репозиториях\n%s" % (e.pkg_name, e.repos))
+            sys.exit()
+        return listmerge(result)
 
     def resolv_dependences(self, pkgs):
         """Функция используяю предыдущую функцию поиска зависимостей на уровне,
