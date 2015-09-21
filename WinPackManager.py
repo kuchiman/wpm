@@ -226,34 +226,34 @@ class WPM():
         return localrepo, repos
 
     def table_print(self, title='', columns='', nextt=False):
-            """Функция форматирует вывод в виде таблички"""
+        """Функция форматирует вывод в виде таблички"""
 
-            space = lambda s, m: (s,
-                " " * (m - len(s))) if len(s) <= m else (s[:m - 1], '')
-            listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
-            maximum = shutil.get_terminal_size((80, 20))[0] - 1
+        space = lambda s, m: (s,
+            " " * (m - len(s))) if len(s) <= m else (s[:m - 1], '')
+        listmerge = lambda s: reduce(lambda d, el: d.extend(el) or d, s, [])
+        maximum = shutil.get_terminal_size((80, 20))[0] - 1
 
-            def cwidth(cn):
-                "Функция вычисляет ширину каждого из столбцов"
-                free = maximum - cn - 1
-                tmp = int(free / cn)
-                width = [tmp for n in range(cn)]
-                if free % cn != 0:
-                    width[0] += free % cn
-                return width
+        def cwidth(cn):
+            "Функция вычисляет ширину каждого из столбцов"
+            free = maximum - cn - 1
+            tmp = int(free / cn)
+            width = [tmp for n in range(cn)]
+            if free % cn != 0:
+                width[0] += free % cn
+            return width
 
-            if not nextt:
-                print("-" * maximum)
-            if title:
-                print("|%s%s|" % space(title, maximum - 2))
-                print("-" * maximum)
-            if columns:
-                sp = cwidth(len(columns[0]))
-                for c in columns:
-                    print(("|%s%s" * len(columns[0]) + "|") %
-                        tuple(listmerge(
-                            [space(c[i], sp[i]) for i in range(len(c))])))
-                print("-" * maximum)
+        if not nextt:
+            print("-" * maximum)
+        if title:
+            print("|%s%s|" % space(title, maximum - 2))
+            print("-" * maximum)
+        if columns:
+            sp = cwidth(len(columns[0]))
+            for c in columns:
+                print(("|%s%s" * len(columns[0]) + "|") %
+                    tuple(listmerge(
+                        [space(c[i], sp[i]) for i in range(len(c))])))
+            print("-" * maximum)
 
     def list(self):
         self.table_print(title="Доступны следующие пакеты")
