@@ -281,10 +281,7 @@ class WPM():
         """Функция проверяет есть ли пакет с таким именем и если есть то в
         скольких репозиториях. На данный момент наличие пакета в нескольких
         репозиториях рассматривается как ошибка"""
-        pkg_in = []
-        for r in self.repos:
-            if r.search(pkg):
-                pkg_in.append(r)
+        pkg_in = [r for r in self.repos if r.search(pkg)]
         if len(pkg_in) == 0:
             raise PackNameErr(pkg)
         elif len(pkg_in) > 1:
