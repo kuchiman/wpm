@@ -185,6 +185,7 @@ class MultiRepoCollision(WpmErr):
 
 
 class WPM():
+    """Класс описывает пакетный менеджер"""
 
     def __init__(self):
         self.localrepo, self.repos = self.read_config()
