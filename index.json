@@ -1,0 +1,55 @@
+{
+    "vlc": {
+        "type": "program",
+        "2.2.11": {
+            "noarch": {
+                "dependencies": {
+                    "msvc": {
+                        "arch": [
+                            "x86_32"
+                        ],
+                        "version": "2.2"
+                    },
+                    "test1": {
+                        "arch": [
+                            "x86_32"
+                        ],
+                        "version": "0.2"
+                    },
+                    "bk": {
+                        "arch": [
+                            "x86_32",
+                            "x86_64"
+                        ],
+                        "version": "2"
+                    }
+                }
+            }
+        },
+        "2.2.12": {
+            "noarch": {
+                "dependencies": {
+                    "msvc": {
+                        "arch": [
+                            "x86_32"
+                        ],
+                        "version": "2.2"
+                    },
+                    "test1": {
+                        "arch": [
+                            "x86_32"
+                        ],
+                        "version": "0.2"
+                    },
+                    "bk": {
+                        "arch": [
+                            "x86_32",
+                            "x86_64"
+                        ],
+                        "version": "2"
+                    }
+                }
+            }
+        }
+    }
+}
